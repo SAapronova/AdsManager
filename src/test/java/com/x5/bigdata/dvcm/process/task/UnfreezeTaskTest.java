@@ -2,6 +2,7 @@ package com.x5.bigdata.dvcm.process.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.x5.bigdata.dvcm.process.config.AppConfig;
+import com.x5.bigdata.dvcm.process.service.CampaignService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.spring.boot.starter.SpringBootProcessApplication;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,9 @@ class UnfreezeTaskTest {
 
     @MockBean
     private SpringBootProcessApplication camunda;
+
+    @MockBean
+    private CampaignService campaignService;
 
     @Mock
     private DelegateExecution execution;

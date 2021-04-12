@@ -5,10 +5,10 @@ import com.x5.bigdata.dvcm.process.dto.ComarchStatusDto;
 import com.x5.bigdata.dvcm.process.dto.MechanicsParamsDto;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
+import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import com.x5.bigdata.dvcm.process.service.CampaignService;
-import com.x5.bigdata.dvcm.process.service.GuestService;
 import com.x5.bigdata.dvcm.process.service.SegmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,6 @@ public class CheckComarchTask implements JavaDelegate {
 
     private final CampaignService campaignService;
     private final SegmentService segmentService;
-    private final GuestService guestService;
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
@@ -58,6 +57,7 @@ public class CheckComarchTask implements JavaDelegate {
                 segmentService.setComarchStatus(segment.getId(), statusDto);
             }
         }
+        campaignService.setStatus(campaignCode, CampaignStatus.UPC);
         log.info("End CheckComarchTask for campaign {} ", campaignCode);
     }
 }

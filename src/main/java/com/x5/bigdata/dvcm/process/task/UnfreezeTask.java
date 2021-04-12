@@ -1,6 +1,8 @@
 package com.x5.bigdata.dvcm.process.task;
 
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
+import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
+import com.x5.bigdata.dvcm.process.service.CampaignService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -16,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 public class UnfreezeTask implements JavaDelegate {
     private static final String URL = "/freeze/freeze/";
 
+    private final CampaignService campaignService;
     private final RestTemplate restTemplate;
 
     @Override
@@ -30,6 +33,7 @@ public class UnfreezeTask implements JavaDelegate {
         HttpEntity<SegmentDto> request = new HttpEntity<>(dto);
         restTemplate.exchange(URL, HttpMethod.DELETE, request, String.class);
 
+        campaignService.setStatus(campaignCode, CampaignStatus.FINISH);
         log.info("End UnfreezeTask for campaign {} ", campaignCode);
     }
 }

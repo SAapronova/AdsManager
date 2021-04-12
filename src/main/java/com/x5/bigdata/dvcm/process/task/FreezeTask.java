@@ -3,6 +3,7 @@ package com.x5.bigdata.dvcm.process.task;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
+import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.service.CampaignService;
 import com.x5.bigdata.dvcm.process.service.GuestService;
@@ -54,6 +55,7 @@ public class FreezeTask implements JavaDelegate {
                 guestService.setFrozen(segment.getId(), statuses);
             }
         }
+        campaignService.setStatus(campaignCode, CampaignStatus.CLM);
         log.info("End FreezeTask for campaign {} ", campaignCode);
     }
 }

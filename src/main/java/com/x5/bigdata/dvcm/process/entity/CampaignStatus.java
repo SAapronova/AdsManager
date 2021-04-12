@@ -1,6 +1,13 @@
 package com.x5.bigdata.dvcm.process.entity;
 
 public enum CampaignStatus {
-    PENDING,
-    FINISHED
+    START,
+    FREEZE,
+    CLM,
+    CLM_CHECK,
+    UPC,
+    UPC_CHECK,
+    UNFREEZE,
+    FINISH,
+    FAIL
 }

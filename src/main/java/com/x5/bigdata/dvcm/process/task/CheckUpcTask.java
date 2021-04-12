@@ -3,6 +3,7 @@ package com.x5.bigdata.dvcm.process.task;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
+import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import com.x5.bigdata.dvcm.process.service.CampaignService;
@@ -55,6 +56,7 @@ public class CheckUpcTask implements JavaDelegate {
                 }
             }
         }
+        campaignService.setStatus(campaignCode, CampaignStatus.UNFREEZE);
         log.info("End CheckUpcTask for campaign {} ", campaignCode);
     }
 }

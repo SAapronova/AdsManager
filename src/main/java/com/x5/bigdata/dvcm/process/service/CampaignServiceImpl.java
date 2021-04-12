@@ -29,6 +29,7 @@ public class CampaignServiceImpl implements CampaignService {
     private final CampaignRepository campaignRepository;
     private final SegmentService segmentService;
     private final RuntimeService runtimeService;
+    private final KafkaService kafkaService;
 
     @Transactional
     public Campaign getByCode(String campaignCode) {
@@ -49,7 +50,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .setPeriodStart(dto.getPeriodStart())
                 .setPeriodEnd(dto.getPeriodEnd())
                 .setPostPeriodEnd(dto.getPostPeriodEnd())
-                .setStatus(CampaignStatus.PENDING);
+                .setStatus(CampaignStatus.START);
 
         campaign = campaignRepository.save(campaign);
         segmentService.save(campaign.getId(), dto.getSegments());
@@ -64,5 +65,15 @@ public class CampaignServiceImpl implements CampaignService {
         log.info("Run process {} for campaign {} ", pi.getId(), campaign.getCampaignCode());
 
         return campaign;
+    }
+
+    @Override
+    @Transactional
+    public void setStatus(String campaignCode, CampaignStatus status) {
+        Campaign campaign = campaignRepository.findCampaignByCampaignCode(campaignCode);
+        if (!campaign.getStatus().equals(status)) {
+            campaign.setStatus(status);
+            kafkaService.sendProcessStatus(campaignCode, status);
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.x5.bigdata.dvcm.process.dto.ComarchRuleDto;
 import com.x5.bigdata.dvcm.process.dto.MechanicsParamsDto;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
+import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import com.x5.bigdata.dvcm.process.service.CampaignService;
@@ -69,6 +70,7 @@ public class SendToComarchTask implements JavaDelegate {
                 }
             }
         }
+        campaignService.setStatus(campaignCode, CampaignStatus.CLM_CHECK);
         log.info("End SendToComarchTask for campaign {} ", campaignCode);
     }
 }
