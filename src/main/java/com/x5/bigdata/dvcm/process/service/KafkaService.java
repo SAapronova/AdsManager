@@ -17,23 +17,19 @@ public class KafkaService {
     private final int sendTimeout;
     private final String statusTopic;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final CampaignService campaignService;
 
     public KafkaService(@Value("${kafka.producer.send.timeout.sec}") int sendTimeout,
                         @Value("${kafka.topic.campaign.status}") String statusTopic,
                         @Value("${kafka.enable:false}") Boolean kafkaEnable,
-                        KafkaTemplate<String, Object> kafkaTemplate,
-                        CampaignService campaignService) {
+                        KafkaTemplate<String, Object> kafkaTemplate) {
         this.kafkaEnable = kafkaEnable;
         this.sendTimeout = sendTimeout;
         this.kafkaTemplate = kafkaTemplate;
         this.statusTopic = statusTopic;
-        this.campaignService = campaignService;
     }
 
     public void sendProcessStatus(String campaignCode, CampaignStatus status) {
         log.info("Init send campaign {} status {} to kafka {} ", campaignCode, status, statusTopic);
-        campaignService.setStatus(campaignCode, status);
         if (kafkaEnable) {
             try {
                 CampaignStatusDto statusDto = CampaignStatusDto.builder()
