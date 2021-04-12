@@ -88,6 +88,11 @@ spec:
                 secretKeyRef:
                   name: jira-secrets
                   key: jira.password
+            - name: KAFKA_TOPIC
+              valueFrom:
+                secretKeyRef:
+                  name: cvm-secret
+                  key: kafka_topic
             - name: KRB_USER
               value: srv.bdrs-dev
             - name: KEYTAB_PATH
