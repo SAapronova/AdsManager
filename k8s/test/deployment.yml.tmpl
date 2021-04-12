@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: dcvm-process-manager
-          image: {IMAGE_VERSION}
+          image: {$IMAGE_VERSION}
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -88,8 +88,6 @@ spec:
                 secretKeyRef:
                   name: jira-secrets
                   key: jira.password
-            - name: DEPLOY_TIME
-              value: {DEPLOY_DATE}
             - name: KRB_USER
               value: srv.bdrs-dev
             - name: KEYTAB_PATH
