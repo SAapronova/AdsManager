@@ -1,0 +1,48 @@
+include:
+  - project: dcvm5/ci-templates
+    file: /AutoDeploy.gitlab-ci.yml
+
+variables:
+  BUILD: "TRUE"
+  BUILD_IMAGE: "TRUE"
+  LINTER: "TRUE"
+  DEPLOY: "TRUE"
+
+stages:
+  - build
+  - linter
+  - build-image
+  - deploy
+
+deploy:dev:
+  variables:
+    DEPLOY_K8S_DIR: "k8s/test"
+    DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
+    NAMESPACE: "cvm-dev"
+    DEPLOY_CONFIGMAP: "false"
+    DEPLOY_CONFIG_FILE_PATH: "config/application-dev.properties"
+    DEPLOY_CONFIGMAP_NAME: "${CI_PROJECT_NAME}"
+    DEPLOY_CONFIG_FILE_NAME: "application.properties"
+  extends: .deploy
+
+deploy:test:
+  variables:
+    DEPLOY_K8S_DIR: "k8s/test"
+    DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
+    NAMESPACE: "cvm-test"
+    DEPLOY_CONFIGMAP: "false"
+    DEPLOY_CONFIG_FILE_PATH: "config/application-test.properties"
+    DEPLOY_CONFIGMAP_NAME: "${CI_PROJECT_NAME}"
+    DEPLOY_CONFIG_FILE_NAME: "application.properties"
+  extends: .deploy
+
+deploy:demo:
+  variables:
+    DEPLOY_K8S_DIR: "k8s/test"
+    DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
+    NAMESPACE: "cvm-demo"
+    DEPLOY_CONFIGMAP: "false"
+    DEPLOY_CONFIG_FILE_PATH: "config/application-demo.properties"
+    DEPLOY_CONFIGMAP_NAME: "${CI_PROJECT_NAME}"
+    DEPLOY_CONFIG_FILE_NAME: "application.properties"
+  extends: .deploy

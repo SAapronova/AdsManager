@@ -1,0 +1,99 @@
+plugins {
+    id "org.sonarqube" version "3.1.1"
+    id "jacoco"
+    id 'org.springframework.boot' version '2.4.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id "io.freefair.lombok" version "5.3.0"
+    id 'java-library'
+    id 'java'
+}
+group = 'com.x5.bigdata.dcvm'
+sourceCompatibility = 11.0
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+plugins.withType(JacocoPlugin) {
+    tasks["test"].finalizedBy 'jacocoTestReport'
+}
+
+sonarqube {
+    properties {
+        property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.projectKey", "dcvm-process-manager"
+        property "sonar.login", "2ec75f3b1b42661deccf3d6929a1cccaabb05165"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api 'com.querydsl:querydsl-jpa:4.4.0'
+
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'com.querydsl:querydsl-apt:4.4.0:jpa'
+    annotationProcessor 'javax.annotation:javax.annotation-api'
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+   // implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+   // implementation 'org.springframework.security:spring-security-ldap'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    implementation 'org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:7.14.0'
+   // implementation 'com.sun.xml.bind:jaxb-impl:2.2.3'
+
+    implementation 'org.springframework.kafka:spring-kafka'
+    runtime "org.springframework.boot:spring-boot-properties-migrator"
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'org.flywaydb:flyway-core'
+
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+
+    implementation 'io.jsonwebtoken:jjwt-api:0.10.7'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.10.7'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.10.7'
+
+    implementation 'io.minio:minio:7.1.2'
+
+    runtimeOnly 'org.postgresql:postgresql'
+
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.6'
+
+    implementation 'ch.qos.logback.contrib:logback-json-core:0.1.5'
+    implementation 'ch.qos.logback.contrib:logback-jackson:0.1.5'
+    implementation 'ch.qos.logback.contrib:logback-json-classic:0.1.5'
+
+    implementation group: 'commons-io', name: 'commons-io', version: '2.7'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
+    implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient'
+
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation('org.springframework.security:spring-security-test')
+    testImplementation group: 'com.h2database', name: 'h2', version: '1.3.148'
+//    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+//    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+    test {
+        useJUnitPlatform()
+    }
+}
