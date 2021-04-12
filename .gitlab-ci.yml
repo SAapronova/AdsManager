@@ -16,6 +16,7 @@ stages:
 
 deploy:dev:
   variables:
+    KUBE_CONFIG: "${KUBE_CONFIG_DEV}"
     DEPLOY_K8S_DIR: "k8s/test"
     DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
     NAMESPACE: "cvm-dev"
@@ -27,6 +28,7 @@ deploy:dev:
 
 deploy:test:
   variables:
+    KUBE_CONFIG: "${KUBE_CONFIG_DEV}"
     DEPLOY_K8S_DIR: "k8s/test"
     DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
     NAMESPACE: "cvm-test"
@@ -38,6 +40,7 @@ deploy:test:
 
 deploy:demo:
   variables:
+    KUBE_CONFIG: "${KUBE_CONFIG_DEV}"
     DEPLOY_K8S_DIR: "k8s/test"
     DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
     NAMESPACE: "cvm-demo"
