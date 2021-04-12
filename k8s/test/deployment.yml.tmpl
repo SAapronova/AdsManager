@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: dcvm-process-manager
-          image: {$IMAGE_VERSION}
+          image: ${IMAGE_NAME}
           ports:
             - containerPort: 8080
           readinessProbe:
