@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Getter
@@ -15,12 +17,16 @@ import java.util.List;
 @Builder
 public class CampaignSegmentDto {
     @JsonProperty("segment_type")
+    @NotNull
     private SegmentType segmentType;
 
     @JsonProperty("channel")
+    @NotNull
     private ChannelType channel;
 
     @JsonProperty("guest_list")
+    @NotNull
+    @Size(min = 1)
     private List<Long> guests;
 
     @JsonProperty("content_text")
@@ -36,5 +42,6 @@ public class CampaignSegmentDto {
     private String imageUrl;
 
     @JsonProperty("offer_template")
+    @NotNull
     private OfferTemplate offerTemplate;
 }

@@ -1,9 +1,11 @@
 package com.x5.bigdata.dvcm.process.controller.advice;
 
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.x5.bigdata.dvcm.process.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,21 +17,19 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import java.nio.file.AccessDeniedException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
 public class ControllerAdvice {
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({Exception.class})
     public BaseResponse<Void> handle(HttpServletRequest req, Exception e) {
         log.error("INTERNAL_SERVER_ERROR, URI: {}, params: {}", req.getRequestURI(), getParams(req), e);
-        return BaseResponse.fail(new ServerError(e.getMessage()));
+
+        return BaseResponse.fail(new ValidationError(List.of(new ValidationItem(null, null, e.getMessage()))));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -55,7 +55,7 @@ public class ControllerAdvice {
         return BaseResponse.fail(new NotFoundError(e.getItems()));
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(AccessDeniedException.class)
     public BaseResponse<String> accessDeniedHandle(HttpServletRequest req, AccessDeniedException e) {
         log.error("ACCESS_DENIED, URI: {}, params: {}", req.getRequestURI(), getParams(req), e);
@@ -82,11 +82,29 @@ public class ControllerAdvice {
                 .stream()
                 .map(error -> {
                     String fieldName = ((FieldError) error).getField();
-                    String value = ((FieldError) error).getRejectedValue().toString();
+                    String value = Optional.ofNullable(((FieldError) error).getRejectedValue()).orElse("null").toString();
                     String errorMessage = error.getDefaultMessage();
                     return new ValidationItem(fieldName, value, errorMessage);
                 }).collect(Collectors.toList());
         return BaseResponse.fail(new ValidationError(errors));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public BaseResponse<String> invalidFormatExceptionHandler(HttpServletRequest req, HttpMessageNotReadableException e) {
+        log.warn("BAD_REQUEST_InvalidFormat, URI: {}, params: {}, message: {}",
+                req.getRequestURI(), getParams(req), e.getMessage());
+        ValidationItem error;
+
+        if (e.getCause() instanceof InvalidFormatException) {
+            InvalidFormatException cause = (InvalidFormatException) e.getCause();
+            error = new ValidationItem(cause.getPath().get(cause.getPath().size() - 1).getFieldName(),
+                    cause.getValue().toString(), cause.getMessage());
+        } else {
+            error = new ValidationItem(null, null, e.getMessage());
+        }
+
+        return BaseResponse.fail(new ValidationError(List.of(error)));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

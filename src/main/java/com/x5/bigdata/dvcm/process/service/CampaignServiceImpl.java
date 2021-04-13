@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.x5.bigdata.dvcm.process.validators.ValidationMessages.CAMPAIGN_ALREADY_EXISTS;
+import static com.x5.bigdata.dvcm.process.validators.ValidationMessages.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,6 +41,15 @@ public class CampaignServiceImpl implements CampaignService {
         if (campaignRepository.existsByCampaignCode(dto.getCampaignCode())) {
             throw new ValidationException(List.of(
                     new ValidationItem("camp_id", dto.getCampaignCode(), CAMPAIGN_ALREADY_EXISTS)));
+        }
+        if (dto.getPeriodStart().isAfter(dto.getPeriodEnd())) {
+            throw new ValidationException(List.of(
+                    new ValidationItem("date_start", dto.getPeriodStart().toString(), WRONG_PERIOD)));
+        }
+
+        if (dto.getPeriodEnd().isAfter(dto.getPostPeriodEnd())) {
+            throw new ValidationException(List.of(
+                    new ValidationItem("date_postperiod", dto.getPeriodStart().toString(), WRONG_POST_PERIOD)));
         }
 
         Campaign campaign = new Campaign()

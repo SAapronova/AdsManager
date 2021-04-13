@@ -2,7 +2,6 @@ package com.x5.bigdata.dvcm.process.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
-import com.x5.bigdata.dvcm.process.entity.Campaign;
 import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
@@ -35,9 +34,7 @@ public class CheckUpcTask implements JavaDelegate {
         String campaignCode = execution.getProcessBusinessKey();
         log.info("Init CheckUpcTask for campaign {} ", campaignCode);
 
-        Campaign campaign = campaignService.getByCode(campaignCode);
-
-        for (Segment segment : campaign.getSegments()) {
+        for (Segment segment : campaignService.getByCode(campaignCode).getSegments()) {
             if (!SegmentType.CONTROL_GROUP.equals(segment.getType())) {
                 List<Long> codes = guestService.getCodesBySegmentId(segment.getId());
 

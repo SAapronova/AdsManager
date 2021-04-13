@@ -11,6 +11,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 @Configuration
 public class KafkaConfig {
     @Bean
+    @SuppressWarnings("java:S1452")
     public ProducerFactory<String, ?> producerFactory(KafkaProperties kafkaProperties, ObjectMapper objectMapper) {
         DefaultKafkaProducerFactory<String, ?> customKafkaProducerFactory =
                 new DefaultKafkaProducerFactory<>(kafkaProperties.buildProducerProperties());

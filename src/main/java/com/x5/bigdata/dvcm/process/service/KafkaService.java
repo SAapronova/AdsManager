@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class KafkaService {
-    private final Boolean kafkaEnable;
+    private final boolean kafkaEnable;
     private final int sendTimeout;
     private final String statusTopic;
     private final KafkaTemplate<String, Object> kafkaTemplate;
@@ -28,6 +28,7 @@ public class KafkaService {
         this.statusTopic = statusTopic;
     }
 
+    @SuppressWarnings("java:S2142")
     public void sendProcessStatus(String campaignCode, CampaignStatus status) {
         log.info("Init send campaign {} status {} to kafka {} ", campaignCode, status, statusTopic);
         if (kafkaEnable) {

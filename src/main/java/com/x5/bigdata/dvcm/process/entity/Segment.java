@@ -3,6 +3,7 @@ package com.x5.bigdata.dvcm.process.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @Accessors(chain = true)
 @Entity
 @Table(name = "segment")

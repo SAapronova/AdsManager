@@ -27,11 +27,11 @@ import java.util.Optional;
 public class SendToComarchTask implements JavaDelegate {
     private static final String URL = "/cvm_comarch/rule/";
 
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     private final CampaignService campaignService;
     private final SegmentService segmentService;
     private final GuestService guestService;
-    private final ObjectMapper objectMapper;
-    private final RestTemplate restTemplate;
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
