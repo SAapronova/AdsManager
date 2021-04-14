@@ -70,7 +70,7 @@ public class SendToComarchTask implements JavaDelegate {
                 }
             }
         }
-        campaignService.setStatus(campaignCode, CampaignStatus.CLM_CHECK);
+        campaignService.setStatus(campaignCode, CampaignStatus.CLM);
         log.info("End SendToComarchTask for campaign {} ", campaignCode);
     }
 }

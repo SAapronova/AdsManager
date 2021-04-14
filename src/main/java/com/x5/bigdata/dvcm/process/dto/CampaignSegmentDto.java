@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -44,4 +45,9 @@ public class CampaignSegmentDto {
     @JsonProperty("offer_template")
     @NotNull
     private OfferTemplate offerTemplate;
+
+    @JsonProperty("offer_data")
+    @NotNull
+    @Valid
+    private OfferDataDto offerData;
 }

@@ -1,43 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.11.3">
-  <bpmn:process id="CampaignProcess" name="Процесс проведения кампании" isExecutable="true" camunda:versionTag="1.0.0">
-    <bpmn:intermediateCatchEvent id="WaitStartCampaign" name="Ожидание даты начала компании">
-      <bpmn:incoming>RequestEvent</bpmn:incoming>
-      <bpmn:outgoing>StartCampaignEvent</bpmn:outgoing>
+  <bpmn:process id="CampaignProcess" name="Процесс проведения кампании" isExecutable="true" camunda:versionTag="2.0.0">
+    <bpmn:intermediateCatchEvent id="WaitStartCampaign" name="Ожидание 22:00 дня перед началом кампании">
+      <bpmn:incoming>FreezeDoneEvent</bpmn:incoming>
+      <bpmn:outgoing>SetRuleEvent</bpmn:outgoing>
       <bpmn:timerEventDefinition>
-        <bpmn:timeDate xsi:type="bpmn:tFormalExpression">${next_time}</bpmn:timeDate>
+        <bpmn:timeDate xsi:type="bpmn:tFormalExpression">${start_rule_date}</bpmn:timeDate>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
-    <bpmn:sequenceFlow id="RequestEvent" sourceRef="StartEvent" targetRef="WaitStartCampaign" />
     <bpmn:startEvent id="StartEvent" name="Заявка на запуск компании">
       <bpmn:extensionElements>
         <camunda:formData />
       </bpmn:extensionElements>
-      <bpmn:outgoing>RequestEvent</bpmn:outgoing>
+      <bpmn:outgoing>StartCampaignEvent</bpmn:outgoing>
       <bpmn:signalEventDefinition signalRef="NewRequestSignal" />
     </bpmn:startEvent>
-    <bpmn:endEvent id="CampaignEndEvent">
-      <bpmn:incoming>UnfreezeDoneEvent</bpmn:incoming>
-    </bpmn:endEvent>
     <bpmn:serviceTask id="FreezeTask" name="Заморозка" camunda:delegateExpression="${freezeTask}">
       <bpmn:incoming>StartCampaignEvent</bpmn:incoming>
       <bpmn:outgoing>FreezeDoneEvent</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="StartCampaignEvent" sourceRef="WaitStartCampaign" targetRef="FreezeTask" />
+    <bpmn:sequenceFlow id="StartCampaignEvent" sourceRef="StartEvent" targetRef="FreezeTask" />
     <bpmn:serviceTask id="SendToComarchTask" name="Отправка в comarch" camunda:delegateExpression="${sendToComarchTask}">
-      <bpmn:incoming>FreezeDoneEvent</bpmn:incoming>
+      <bpmn:incoming>SetRuleEvent</bpmn:incoming>
       <bpmn:outgoing>SendToComarchDoneEvent</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="FreezeDoneEvent" sourceRef="FreezeTask" targetRef="SendToComarchTask" />
+    <bpmn:sequenceFlow id="FreezeDoneEvent" sourceRef="FreezeTask" targetRef="WaitStartCampaign" />
     <bpmn:sequenceFlow id="SendToComarchDoneEvent" sourceRef="SendToComarchTask" targetRef="WaitComarch" />
     <bpmn:intermediateCatchEvent id="WaitComarch" name="Ожидание установки правил">
       <bpmn:incoming>SendToComarchDoneEvent</bpmn:incoming>
       <bpmn:outgoing>WaitComarchDoneEvent</bpmn:outgoing>
       <bpmn:timerEventDefinition>
-        <bpmn:timeDate xsi:type="bpmn:tFormalExpression">${dateTime().plusDays(1).withHourOfDay(3).toDate()}</bpmn:timeDate>
+        <bpmn:timeDate xsi:type="bpmn:tFormalExpression">${wait_rule_date}</bpmn:timeDate>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
-    <bpmn:serviceTask id="CheckComarchTask" name="Проверка установки правил" camunda:delegateExpression="${checkComarchTask}">
+    <bpmn:serviceTask id="CheckComarchTask" name="Проверка статуса механики" camunda:delegateExpression="${checkComarchTask}">
       <bpmn:incoming>WaitComarchDoneEvent</bpmn:incoming>
       <bpmn:outgoing>CheckCamarchDoneEvent</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -47,7 +43,7 @@
       <bpmn:incoming>CheckCamarchDoneEvent</bpmn:incoming>
       <bpmn:outgoing>DelaySendToUpcDoneEvent</bpmn:outgoing>
       <bpmn:timerEventDefinition>
-        <bpmn:timeDate xsi:type="bpmn:tFormalExpression">${dateTime().withHourOfDay(10).toDate()}</bpmn:timeDate>
+        <bpmn:timeDate xsi:type="bpmn:tFormalExpression">${start_upc_date}</bpmn:timeDate>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
     <bpmn:serviceTask id="SendToUpcTask" name="Отправка в УПК" camunda:delegateExpression="${sendToUpcTask}">
@@ -60,70 +56,81 @@
       <bpmn:outgoing>CheckUpcDoneEvent</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SendToUpcDoneEvent" sourceRef="SendToUpcTask" targetRef="CheckUpcTask" />
-    <bpmn:intermediateCatchEvent id="IntermediateCatchEvent_0h4ycqi" name="Ожидание окончания компании">
-      <bpmn:incoming>CheckUpcDoneEvent</bpmn:incoming>
+    <bpmn:intermediateCatchEvent id="WaitCampaignEnd" name="Ожидание окончания компании">
+      <bpmn:incoming>WaitCampaignEndEvent</bpmn:incoming>
       <bpmn:outgoing>PostPeriodEndEvent</bpmn:outgoing>
       <bpmn:timerEventDefinition>
         <bpmn:timeDate xsi:type="bpmn:tFormalExpression">${post_period_end}</bpmn:timeDate>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
-    <bpmn:sequenceFlow id="CheckUpcDoneEvent" sourceRef="CheckUpcTask" targetRef="IntermediateCatchEvent_0h4ycqi" />
+    <bpmn:sequenceFlow id="CheckUpcDoneEvent" sourceRef="CheckUpcTask" targetRef="ExclusiveGateway_03na3za" />
     <bpmn:serviceTask id="UnfreezeTask" name="Разморозка" camunda:delegateExpression="${unfreezeTask}">
       <bpmn:incoming>PostPeriodEndEvent</bpmn:incoming>
       <bpmn:outgoing>UnfreezeDoneEvent</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="PostPeriodEndEvent" sourceRef="IntermediateCatchEvent_0h4ycqi" targetRef="UnfreezeTask" />
+    <bpmn:sequenceFlow id="PostPeriodEndEvent" sourceRef="WaitCampaignEnd" targetRef="UnfreezeTask" />
     <bpmn:sequenceFlow id="UnfreezeDoneEvent" sourceRef="UnfreezeTask" targetRef="CampaignEndEvent" />
+    <bpmn:sequenceFlow id="SetRuleEvent" sourceRef="WaitStartCampaign" targetRef="SendToComarchTask" />
+    <bpmn:parallelGateway id="ExclusiveGateway_03na3za">
+      <bpmn:incoming>CheckUpcDoneEvent</bpmn:incoming>
+      <bpmn:outgoing>WaitCampaignEndEvent</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1ttp8bq</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="WaitCampaignEndEvent" sourceRef="ExclusiveGateway_03na3za" targetRef="WaitCampaignEnd" />
+    <bpmn:serviceTask id="CheckComarchStatusTask" name="Проверка статуса механики" camunda:delegateExpression="${checkComarchTask}">
+      <bpmn:incoming>SequenceFlow_0pawltp</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_04prl6i</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="WaitCheckMechanicsStatus" name="Задержка перед проверкой статуса">
+      <bpmn:incoming>SequenceFlow_1ttp8bq</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_04prl6i</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0pawltp</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">${check_clm_cycle}</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1ttp8bq" sourceRef="ExclusiveGateway_03na3za" targetRef="WaitCheckMechanicsStatus" />
+    <bpmn:sequenceFlow id="SequenceFlow_0pawltp" sourceRef="WaitCheckMechanicsStatus" targetRef="CheckComarchStatusTask" />
+    <bpmn:endEvent id="CampaignEndEvent">
+      <bpmn:incoming>UnfreezeDoneEvent</bpmn:incoming>
+      <bpmn:terminateEventDefinition />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_04prl6i" sourceRef="CheckComarchStatusTask" targetRef="WaitCheckMechanicsStatus" />
   </bpmn:process>
   <bpmn:signal id="NewRequestSignal" name="New Request Signal" />
   <bpmn:message id="Message_1u26c96" name="Message_0lhdq8n" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CampaignProcess">
       <bpmndi:BPMNShape id="IntermediateCatchEvent_1gxnv1u_di" bpmnElement="WaitStartCampaign">
-        <dc:Bounds x="274" y="102" width="36" height="36" />
+        <dc:Bounds x="426" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="254" y="142" width="88" height="24" />
+          <dc:Bounds x="406" y="142" width="88" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_16vqbsy_di" bpmnElement="RequestEvent">
-        <di:waypoint xsi:type="dc:Point" x="209" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="274" y="120" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="233" y="99" width="18" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="StartEvent_08wc5do_di" bpmnElement="StartEvent">
         <dc:Bounds x="173" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="146" y="143" width="90" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_07zoc2l_di" bpmnElement="CampaignEndEvent">
-        <dc:Bounds x="1432" y="102" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1405" y="142" width="90" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_0dn9f6s_di" bpmnElement="FreezeTask">
-        <dc:Bounds x="371" y="80" width="100" height="80" />
+        <dc:Bounds x="274" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0sfxxs4_di" bpmnElement="StartCampaignEvent">
-        <di:waypoint xsi:type="dc:Point" x="310" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="334" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="334" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="371" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="209" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="274" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="349" y="114" width="0" height="12" />
+          <dc:Bounds x="196.5" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_135hh3e_di" bpmnElement="SendToComarchTask">
         <dc:Bounds x="522" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_14wfhd6_di" bpmnElement="FreezeDoneEvent">
-        <di:waypoint xsi:type="dc:Point" x="471" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="522" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="374" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="426" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="496.5" y="99" width="0" height="12" />
+          <dc:Bounds x="355" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_10d85wr_di" bpmnElement="SendToComarchDoneEvent">
@@ -182,34 +189,92 @@
           <dc:Bounds x="1078.5" y="99" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="IntermediateCatchEvent_0h4ycqi_di" bpmnElement="IntermediateCatchEvent_0h4ycqi">
-        <dc:Bounds x="1223" y="102" width="36" height="36" />
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_0h4ycqi_di" bpmnElement="WaitCampaignEnd">
+        <dc:Bounds x="1321" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1214" y="147" width="54" height="36" />
+          <dc:Bounds x="1312" y="147" width="54" height="36" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0r2e0d7_di" bpmnElement="CheckUpcDoneEvent">
         <di:waypoint xsi:type="dc:Point" x="1193" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1223" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1238" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1208" y="99" width="0" height="12" />
+          <dc:Bounds x="1170.5" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1lytrqe_di" bpmnElement="UnfreezeTask">
-        <dc:Bounds x="1287" y="80" width="100" height="80" />
+        <dc:Bounds x="1392" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1jqgjz7_di" bpmnElement="PostPeriodEndEvent">
-        <di:waypoint xsi:type="dc:Point" x="1259" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1287" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1357" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1392" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1273" y="99" width="0" height="12" />
+          <dc:Bounds x="1329.5" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_01fmzll_di" bpmnElement="UnfreezeDoneEvent">
-        <di:waypoint xsi:type="dc:Point" x="1387" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1432" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1492" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1530" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1409.5" y="99" width="0" height="12" />
+          <dc:Bounds x="1466" y="99" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0x3usev_di" bpmnElement="SetRuleEvent">
+        <di:waypoint xsi:type="dc:Point" x="462" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="522" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="492" y="99" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ParallelGateway_1dm6r73_di" bpmnElement="ExclusiveGateway_03na3za">
+        <dc:Bounds x="1238" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1263" y="149" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1wkpko1_di" bpmnElement="WaitCampaignEndEvent">
+        <di:waypoint xsi:type="dc:Point" x="1288" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1321" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1304.5" y="99" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1snz39t_di" bpmnElement="CheckComarchStatusTask">
+        <dc:Bounds x="1213" y="328" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_16dkho6_di" bpmnElement="WaitCheckMechanicsStatus">
+        <dc:Bounds x="1245" y="215" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1154" y="221" width="83" height="36" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ttp8bq_di" bpmnElement="SequenceFlow_1ttp8bq">
+        <di:waypoint xsi:type="dc:Point" x="1263" y="145" />
+        <di:waypoint xsi:type="dc:Point" x="1263" y="215" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1278" y="174" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0pawltp_di" bpmnElement="SequenceFlow_0pawltp">
+        <di:waypoint xsi:type="dc:Point" x="1263" y="251" />
+        <di:waypoint xsi:type="dc:Point" x="1263" y="328" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1278" y="283.5" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0ixn4yd_di" bpmnElement="CampaignEndEvent">
+        <dc:Bounds x="1530" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1503" y="142" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_04prl6i_di" bpmnElement="SequenceFlow_04prl6i">
+        <di:waypoint xsi:type="dc:Point" x="1313" y="368" />
+        <di:waypoint xsi:type="dc:Point" x="1342" y="368" />
+        <di:waypoint xsi:type="dc:Point" x="1342" y="216" />
+        <di:waypoint xsi:type="dc:Point" x="1267" y="216" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1357" y="286" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

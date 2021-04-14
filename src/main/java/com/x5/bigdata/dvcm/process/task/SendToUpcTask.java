@@ -75,7 +75,7 @@ public class SendToUpcTask implements JavaDelegate {
                 }
             }
         }
-        campaignService.setStatus(campaignCode, CampaignStatus.UPC_CHECK);
+        campaignService.setStatus(campaignCode, CampaignStatus.UPC);
         log.info("End SendToUpcTask for campaign {} ", campaignCode);
     }
 }

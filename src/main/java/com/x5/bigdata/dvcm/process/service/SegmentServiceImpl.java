@@ -1,7 +1,7 @@
 package com.x5.bigdata.dvcm.process.service;
 
-import com.x5.bigdata.dvcm.process.dto.ComarchStatusDto;
 import com.x5.bigdata.dvcm.process.dto.CampaignSegmentDto;
+import com.x5.bigdata.dvcm.process.dto.ComarchStatusDto;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.repository.SegmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,11 @@ public class SegmentServiceImpl implements SegmentService {
                     .setContentLink(segmentDto.getContentLink())
                     .setContentLinkText(segmentDto.getContentLinkText())
                     .setImageUrl(segmentDto.getImageUrl())
-                    .setOfferTemplate(segmentDto.getOfferTemplate());
+                    .setOfferTemplate(segmentDto.getOfferTemplate())
+                    .setPoints(segmentDto.getOfferData().getPoints())
+                    .setMinSum(segmentDto.getOfferData().getMinSum())
+                    .setPurchases(segmentDto.getOfferData().getPurchases())
+                    .setRewardPeriod(segmentDto.getOfferData().getRewardPeriod());
 
             segmentRepository.save(segment);
             guestService.save(segment.getId(), segmentDto.getGuests());

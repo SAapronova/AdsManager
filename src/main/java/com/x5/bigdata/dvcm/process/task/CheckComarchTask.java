@@ -5,7 +5,6 @@ import com.x5.bigdata.dvcm.process.dto.ComarchStatusDto;
 import com.x5.bigdata.dvcm.process.dto.MechanicsParamsDto;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
-import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import com.x5.bigdata.dvcm.process.service.CampaignService;
@@ -57,7 +56,6 @@ public class CheckComarchTask implements JavaDelegate {
                 segmentService.setComarchStatus(segment.getId(), statusDto);
             }
         }
-        campaignService.setStatus(campaignCode, CampaignStatus.UPC);
         log.info("End CheckComarchTask for campaign {} ", campaignCode);
     }
 }

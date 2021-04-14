@@ -55,7 +55,7 @@ public class FreezeTask implements JavaDelegate {
                 guestService.setFrozen(segment.getId(), statuses);
             }
         }
-        campaignService.setStatus(campaignCode, CampaignStatus.CLM);
+        campaignService.setStatus(campaignCode, CampaignStatus.FREEZE);
         log.info("End FreezeTask for campaign {} ", campaignCode);
     }
 }
