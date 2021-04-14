@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,15 +58,20 @@ public class CampaignServiceImpl implements CampaignService {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("camp_id", campaign.getCampaignCode());
-        variables.put("start_date", Timestamp.valueOf(campaign.getPeriodStart()));
+        variables.put("start_date", Timestamp.valueOf(campaign.getPeriodStart()
+                .atOffset(ZoneOffset.ofHours(3)).toLocalDateTime()));
         variables.put("start_rule_date", Timestamp.valueOf(campaign.getPeriodStart()
-                .minusDays(1).withHour(22).withMinute(0).withSecond(0)));
+                .minusDays(1).withHour(22).withMinute(0).withSecond(0)
+                .atOffset(ZoneOffset.ofHours(3)).toLocalDateTime()));
         variables.put("wait_rule_date", Timestamp.valueOf(campaign.getPeriodStart()
-                .withHour(3).withMinute(0).withSecond(0)));
+                .withHour(3).withMinute(0).withSecond(0)
+                .atOffset(ZoneOffset.ofHours(3)).toLocalDateTime()));
         variables.put("start_upc_date", Timestamp.valueOf(campaign.getPeriodStart()
-                .withHour(10).withMinute(0).withSecond(0)));
+                .withHour(10).withMinute(0).withSecond(0)
+                .atOffset(ZoneOffset.ofHours(3)).toLocalDateTime()));
         variables.put("post_period_end", Timestamp.valueOf(campaign.getPostPeriodEnd()
-                .plusDays(1).withHour(0).withMinute(0).withSecond(0)));
+                .plusDays(1).withHour(0).withMinute(0).withSecond(0)
+                .atOffset(ZoneOffset.ofHours(3)).toLocalDateTime()));
         variables.put("check_clm_cycle", "PT6H");
 
         ProcessInstance pi = runtimeService.startProcessInstanceByKey(CAMPAIGN_PROCESS_DEFINITION_KEY,
