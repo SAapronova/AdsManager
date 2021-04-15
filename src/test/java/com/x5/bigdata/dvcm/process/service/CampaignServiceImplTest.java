@@ -19,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -109,11 +110,11 @@ class CampaignServiceImplTest {
                 .startProcessInstanceByKey(eq(CAMPAIGN_PROCESS_DEFINITION_KEY), eq(campaign.getCampaignCode()), anyMap());
         Map<String, Object> variables = captor.getValue();
         assertEquals(campaignDto.getCampaignCode(), variables.get("camp_id"));
-        assertEquals("2021-01-10 00:00:00.0", variables.get("start_date").toString());
-        assertEquals("2021-01-09 22:00:00.0", variables.get("start_rule_date").toString());
-        assertEquals("2021-01-10 03:00:00.0", variables.get("wait_rule_date").toString());
-        assertEquals("2021-01-10 10:00:00.0", variables.get("start_upc_date").toString());
-        assertEquals("2021-03-31 00:00:00.0", variables.get("post_period_end").toString());
+        assertEquals("2021-01-10T00:00", ((Timestamp) variables.get("start_date")).toLocalDateTime().plusHours(3).toString());
+        assertEquals("2021-01-09T22:00", ((Timestamp) variables.get("start_rule_date")).toLocalDateTime().plusHours(3).toString());
+        assertEquals("2021-01-10T03:00", ((Timestamp) variables.get("wait_rule_date")).toLocalDateTime().plusHours(3).toString());
+        assertEquals("2021-01-10T10:00", ((Timestamp) variables.get("start_upc_date")).toLocalDateTime().plusHours(3).toString());
+        assertEquals("2021-03-31T00:00", ((Timestamp) variables.get("post_period_end")).toLocalDateTime().plusHours(3).toString());
         assertEquals("PT6H", variables.get("check_clm_cycle").toString());
     }
 
