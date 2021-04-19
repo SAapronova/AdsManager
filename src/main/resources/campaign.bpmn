@@ -69,7 +69,7 @@
       <bpmn:outgoing>UnfreezeDoneEvent</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="PostPeriodEndEvent" sourceRef="WaitCampaignEnd" targetRef="UnfreezeTask" />
-    <bpmn:sequenceFlow id="UnfreezeDoneEvent" sourceRef="UnfreezeTask" targetRef="CampaignEndEvent" />
+    <bpmn:sequenceFlow id="UnfreezeDoneEvent" sourceRef="UnfreezeTask" targetRef="FinalCheckUpcTask" />
     <bpmn:sequenceFlow id="SetRuleEvent" sourceRef="WaitStartCampaign" targetRef="SendToComarchTask" />
     <bpmn:parallelGateway id="ExclusiveGateway_03na3za">
       <bpmn:incoming>CheckUpcDoneEvent</bpmn:incoming>
@@ -92,10 +92,15 @@
     <bpmn:sequenceFlow id="SequenceFlow_1ttp8bq" sourceRef="ExclusiveGateway_03na3za" targetRef="WaitCheckMechanicsStatus" />
     <bpmn:sequenceFlow id="SequenceFlow_0pawltp" sourceRef="WaitCheckMechanicsStatus" targetRef="CheckComarchStatusTask" />
     <bpmn:endEvent id="CampaignEndEvent">
-      <bpmn:incoming>UnfreezeDoneEvent</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0z434os</bpmn:incoming>
       <bpmn:terminateEventDefinition />
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_04prl6i" sourceRef="CheckComarchStatusTask" targetRef="WaitCheckMechanicsStatus" />
+    <bpmn:serviceTask id="FinalCheckUpcTask" name="Проверка&#10; УПК&#10;" camunda:delegateExpression="${checkUpcTask}">
+      <bpmn:incoming>UnfreezeDoneEvent</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0z434os</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0z434os" sourceRef="FinalCheckUpcTask" targetRef="CampaignEndEvent" />
   </bpmn:process>
   <bpmn:signal id="NewRequestSignal" name="New Request Signal" />
   <bpmn:message id="Message_1u26c96" name="Message_0lhdq8n" />
@@ -214,9 +219,9 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_01fmzll_di" bpmnElement="UnfreezeDoneEvent">
         <di:waypoint xsi:type="dc:Point" x="1492" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1530" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1516" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1466" y="99" width="90" height="12" />
+          <dc:Bounds x="1459" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0x3usev_di" bpmnElement="SetRuleEvent">
@@ -263,9 +268,9 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_0ixn4yd_di" bpmnElement="CampaignEndEvent">
-        <dc:Bounds x="1530" y="102" width="36" height="36" />
+        <dc:Bounds x="1644" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1503" y="142" width="0" height="12" />
+          <dc:Bounds x="1572" y="142" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_04prl6i_di" bpmnElement="SequenceFlow_04prl6i">
@@ -275,6 +280,16 @@
         <di:waypoint xsi:type="dc:Point" x="1267" y="216" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1357" y="286" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0dacqog_di" bpmnElement="FinalCheckUpcTask">
+        <dc:Bounds x="1516" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0z434os_di" bpmnElement="SequenceFlow_0z434os">
+        <di:waypoint xsi:type="dc:Point" x="1616" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1644" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1630" y="99" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
