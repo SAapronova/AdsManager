@@ -3,7 +3,6 @@ package com.x5.bigdata.dvcm.process.task;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.x5.bigdata.dvcm.process.config.AppConfig;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
-import com.x5.bigdata.dvcm.process.entity.ChannelType;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import com.x5.bigdata.dvcm.process.service.CampaignService;
@@ -75,7 +74,7 @@ class CheckUpcTaskTest {
                 .expect(requestTo("http://service/cvm_upc/communications/check"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(jsonPath("$.camp_id", is(CAMPAIGN_CODE)))
-                .andExpect(jsonPath("$.channel", is("sms")))
+                .andExpect(jsonPath("$.channel", is("SMS")))
                 .andExpect(jsonPath("$.guest_list", hasSize(2)))
                 .andExpect(jsonPath("$.guest_list[0]", is(1)))
                 .andExpect(jsonPath("$.guest_list[1]", is(2)))
@@ -103,11 +102,11 @@ class CheckUpcTaskTest {
                         new Segment()
                                 .setId(CONTROL_SEGMENT_ID)
                                 .setType(SegmentType.CONTROL_GROUP)
-                                .setChannelType(ChannelType.VIBER),
+                                .setChannelType("VIBER"),
                         new Segment()
                                 .setId(TARGET_SEGMENT_ID)
                                 .setType(SegmentType.TARGET_GROUP)
-                                .setChannelType(ChannelType.SMS)
+                                .setChannelType("SMS")
                 ));
 
         return campaign;

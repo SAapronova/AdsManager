@@ -75,7 +75,7 @@ class SendToUpcTaskTest {
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(jsonPath("$.camp_id", is(CAMPAIGN_CODE)))
                 .andExpect(jsonPath("$.segment_type", is("2")))
-                .andExpect(jsonPath("$.channel", is("sms")))
+                .andExpect(jsonPath("$.channel", is("SMS")))
                 .andExpect(jsonPath("$.date_start", is("2021-01-02 12:30:00")))
                 .andExpect(jsonPath("$.date_end", is("2021-03-04 11:20:00")))
                 .andExpect(jsonPath("$.mechanics", is("TST_SAS_14")))
@@ -119,7 +119,7 @@ class SendToUpcTaskTest {
                                 .setMinSum(3)
                                 .setPurchases(4)
                                 .setRewardPeriod(5)
-                                .setChannelType(ChannelType.VIBER),
+                                .setChannelType("VIBER"),
                         new Segment()
                                 .setId(TARGET_SEGMENT_ID)
                                 .setOfferTemplate(OfferTemplate.TST_SAS_14)
@@ -133,7 +133,7 @@ class SendToUpcTaskTest {
                                 .setContentLinkText("content link text")
                                 .setImageUrl("image url")
                                 .setType(SegmentType.TARGET_GROUP)
-                                .setChannelType(ChannelType.SMS)
+                                .setChannelType("SMS")
                 ));
 
         return campaign;

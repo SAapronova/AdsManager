@@ -3,7 +3,6 @@ package com.x5.bigdata.dvcm.process.task;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.x5.bigdata.dvcm.process.config.AppConfig;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
-import com.x5.bigdata.dvcm.process.entity.ChannelType;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import com.x5.bigdata.dvcm.process.service.CampaignService;
@@ -130,11 +129,11 @@ class FreezeTaskTest {
                         new Segment()
                                 .setId(CONTROL_SEGMENT_ID)
                                 .setType(SegmentType.CONTROL_GROUP)
-                                .setChannelType(ChannelType.VIBER),
+                                .setChannelType("VIBER"),
                         new Segment()
                                 .setId(TARGET_SEGMENT_ID)
                                 .setType(SegmentType.TARGET_GROUP)
-                                .setChannelType(ChannelType.SMS)
+                                .setChannelType("SMS")
                 ));
 
         return campaign;

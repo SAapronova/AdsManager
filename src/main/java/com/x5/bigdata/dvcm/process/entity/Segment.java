@@ -33,8 +33,7 @@ public class Segment {
     private SegmentType type;
 
     @Column(name = "channel_type")
-    @Enumerated(EnumType.STRING)
-    private ChannelType channelType;
+    private String channelType;
 
     @Column(name = "content_text")
     private String contentText;
