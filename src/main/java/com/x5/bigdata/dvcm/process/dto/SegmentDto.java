@@ -3,7 +3,6 @@ package com.x5.bigdata.dvcm.process.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.x5.bigdata.dvcm.process.entity.ChannelType;
 import com.x5.bigdata.dvcm.process.entity.OfferTemplate;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import lombok.Builder;
@@ -21,7 +20,7 @@ public class SegmentDto {
     private SegmentType segmentType;
 
     @JsonProperty("channel")
-    private ChannelType channelType;
+    private String channelType;
 
     @JsonProperty("date_start")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -3,7 +3,6 @@ package com.x5.bigdata.dvcm.process.service;
 import com.x5.bigdata.dvcm.process.dto.CampaignSegmentDto;
 import com.x5.bigdata.dvcm.process.dto.ComarchStatusDto;
 import com.x5.bigdata.dvcm.process.dto.OfferDataDto;
-import com.x5.bigdata.dvcm.process.entity.ChannelType;
 import com.x5.bigdata.dvcm.process.entity.OfferTemplate;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
@@ -92,7 +91,7 @@ class SegmentServiceImplTest {
         Segment targetSegment = segmentCaptor.getAllValues().get(0);
         assertEquals(CAMPAIGN_ID, targetSegment.getCampaignId());
         assertEquals(SegmentType.TARGET_GROUP, targetSegment.getType());
-        assertEquals(ChannelType.SMS, targetSegment.getChannelType());
+        assertEquals("SMS", targetSegment.getChannelType());
         assertEquals(OfferTemplate.TST_SAS_14, targetSegment.getOfferTemplate());
         assertEquals(1, targetSegment.getMinSum());
         assertEquals(2, targetSegment.getPoints());
@@ -102,7 +101,7 @@ class SegmentServiceImplTest {
         Segment controlSegment = segmentCaptor.getAllValues().get(1);
         assertEquals(CAMPAIGN_ID, controlSegment.getCampaignId());
         assertEquals(SegmentType.CONTROL_GROUP, controlSegment.getType());
-        assertEquals(ChannelType.VIBER, controlSegment.getChannelType());
+        assertEquals("VIBER", controlSegment.getChannelType());
         assertEquals(OfferTemplate.TST_SAS_14, controlSegment.getOfferTemplate());
         assertEquals(5, controlSegment.getMinSum());
         assertEquals(6, controlSegment.getPoints());
@@ -124,7 +123,7 @@ class SegmentServiceImplTest {
     private List<CampaignSegmentDto> getSegmentDtoList() {
         return List.of(
                 CampaignSegmentDto.builder()
-                        .channel(ChannelType.SMS)
+                        .channel("SMS")
                         .segmentType(SegmentType.TARGET_GROUP)
                         .offerTemplate(OfferTemplate.TST_SAS_14)
                         .offerData(OfferDataDto.builder()
@@ -136,7 +135,7 @@ class SegmentServiceImplTest {
                         .guests(List.of(1L, 2L))
                         .build(),
                 CampaignSegmentDto.builder()
-                        .channel(ChannelType.VIBER)
+                        .channel("VIBER")
                         .segmentType(SegmentType.CONTROL_GROUP)
                         .offerTemplate(OfferTemplate.TST_SAS_14)
                         .offerData(OfferDataDto.builder()

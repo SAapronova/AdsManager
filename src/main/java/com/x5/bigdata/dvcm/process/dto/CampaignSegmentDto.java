@@ -1,7 +1,6 @@
 package com.x5.bigdata.dvcm.process.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.x5.bigdata.dvcm.process.entity.ChannelType;
 import com.x5.bigdata.dvcm.process.entity.OfferTemplate;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import lombok.Builder;
@@ -9,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -22,8 +22,8 @@ public class CampaignSegmentDto {
     private SegmentType segmentType;
 
     @JsonProperty("channel")
-    @NotNull
-    private ChannelType channel;
+    @NotBlank
+    private String channel;
 
     @JsonProperty("guest_list")
     @NotNull

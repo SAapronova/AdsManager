@@ -113,7 +113,7 @@ class SendToComarchTaskTest {
                                 .setMinSum(3)
                                 .setPurchases(4)
                                 .setRewardPeriod(5)
-                                .setChannelType(ChannelType.VIBER),
+                                .setChannelType("VIBER"),
                         new Segment()
                                 .setId(TARGET_SEGMENT_ID)
                                 .setOfferTemplate(OfferTemplate.TST_SAS_14)
@@ -127,7 +127,7 @@ class SendToComarchTaskTest {
                                 .setContentLinkText("content link text")
                                 .setImageUrl("image url")
                                 .setType(SegmentType.TARGET_GROUP)
-                                .setChannelType(ChannelType.SMS)
+                                .setChannelType("SMS")
                 ));
 
         return campaign;
