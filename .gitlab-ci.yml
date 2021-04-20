@@ -38,6 +38,18 @@ deploy:test:
     DEPLOY_CONFIG_FILE_NAME: "application.properties"
   extends: .deploy
 
+deploy:release:
+  variables:
+    KUBE_CONFIG: "${KUBE_CONFIG_DEV}"
+    DEPLOY_K8S_DIR: "k8s/test"
+    DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
+    NAMESPACE: "release"
+    DEPLOY_CONFIGMAP: "true"
+    DEPLOY_CONFIG_FILE_PATH: "config/application-release.properties"
+    DEPLOY_CONFIGMAP_NAME: "${CI_PROJECT_NAME}"
+    DEPLOY_CONFIG_FILE_NAME: "application.properties"
+  extends: .deploy
+
 deploy:demo:
   variables:
     KUBE_CONFIG: "${KUBE_CONFIG_DEV}"
