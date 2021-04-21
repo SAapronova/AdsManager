@@ -43,7 +43,7 @@ public class Campaign {
     @Enumerated(EnumType.STRING)
     private CampaignStatus status;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "campaign_id", updatable = false, insertable = false)
     private List<Segment> segments = new ArrayList<>();
 }

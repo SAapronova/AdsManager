@@ -1,11 +1,14 @@
 package com.x5.bigdata.dvcm.process.service;
 
 import com.x5.bigdata.dvcm.process.dto.CampaignDto;
+import com.x5.bigdata.dvcm.process.dto.CampaignInfoDto;
+import com.x5.bigdata.dvcm.process.dto.mapper.CampaignInfoDtoMapper;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
 import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
 import com.x5.bigdata.dvcm.process.exception.ValidationException;
 import com.x5.bigdata.dvcm.process.exception.ValidationItem;
 import com.x5.bigdata.dvcm.process.repository.CampaignRepository;
+import com.x5.bigdata.dvcm.process.task.UnfreezeTask;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
@@ -19,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.x5.bigdata.dvcm.process.validators.ValidationMessages.*;
 
@@ -100,5 +104,11 @@ public class CampaignServiceImpl implements CampaignService {
             campaign.setStatus(status);
             kafkaService.sendProcessStatus(campaignCode, status);
         }
+    }
+
+    @Override
+    @Transactional
+    public List<CampaignInfoDto> findAll() {
+        return campaignRepository.findAll().stream().map(CampaignInfoDtoMapper::map).collect(Collectors.toList());
     }
 }

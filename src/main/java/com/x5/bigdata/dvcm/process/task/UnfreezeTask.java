@@ -24,6 +24,10 @@ public class UnfreezeTask implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         String campaignCode = execution.getProcessBusinessKey();
+        unfreeze(campaignCode);
+    }
+
+    public void unfreeze(String campaignCode) {
         log.info("Init UnfreezeTask for campaign {} ", campaignCode);
 
         SegmentDto dto = SegmentDto.builder()

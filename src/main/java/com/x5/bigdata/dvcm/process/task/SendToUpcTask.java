@@ -38,6 +38,9 @@ public class SendToUpcTask implements JavaDelegate {
         log.info("Init SendToUpcTask for campaign {} ", campaignCode);
 
         Campaign campaign = campaignService.getByCode(campaignCode);
+        if (CampaignStatus.FINISH.equals(campaign.getStatus())) {
+            return;
+        }
 
         for (Segment segment : campaign.getSegments()) {
             if (!SegmentType.CONTROL_GROUP.equals(segment.getType())) {

@@ -6,6 +6,7 @@ import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
 import com.x5.bigdata.dvcm.process.exception.ValidationException;
 import com.x5.bigdata.dvcm.process.exception.ValidationItem;
 import com.x5.bigdata.dvcm.process.repository.CampaignRepository;
+import com.x5.bigdata.dvcm.process.task.UnfreezeTask;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.jupiter.api.BeforeEach;
