@@ -25,7 +25,9 @@ public class CampaignController {
 
     @PostMapping
     public boolean create(@RequestBody @Valid CampaignDto campaignDto) {
+        log.info("New request {} ", campaignDto.getCampaignCode());
         campaignService.create(campaignDto);
+        log.info("Save request {} ", campaignDto.getCampaignCode());
         return true;
     }
 

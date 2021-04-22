@@ -1,6 +1,5 @@
 package com.x5.bigdata.dvcm.process.service;
 
-import com.x5.bigdata.dvcm.process.entity.Guest;
 import com.x5.bigdata.dvcm.process.repository.GuestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,13 @@ public class GuestServiceImpl implements GuestService {
     @Override
     @Transactional
     public void save(UUID segmentId, List<Long> guests) {
-        guests.forEach(code -> guestRepository.save(new Guest(code, segmentId)));
+        int size = guests.size();
+        int i0 = 0;
+        while (i0 < size) {
+            int i1 = Math.min(size, i0 + 100);
+            guestRepository.insertBatch(segmentId, guests.subList(i0, i1));
+            i0 = i1;
+        }
     }
 
     @Override

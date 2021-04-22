@@ -27,4 +27,10 @@ public interface GuestRepository extends JpaRepository<Guest, UUID> {
     void setUpcStatus(@Param(value = "segmentId") UUID segmentId,
                       @Param(value = "code") Long code,
                       @Param(value = "status") String status);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query(value = "insert into guest (guest_code, segment_id) " +
+            "select cast(cast(unnest(ARRAY(SELECT json_array_elements(json_build_array :codes))) as text) as bigint), :segmentId",
+            nativeQuery = true)
+    void insertBatch(@Param("segmentId") UUID segmentId, @Param("codes") List<Long> codes);
 }
