@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.x5.bigdata.dvcm.process.validators.ValidationMessages.*;
@@ -72,10 +73,11 @@ public class CampaignServiceImpl implements CampaignService {
                 .plusDays(1).withHour(0).withMinute(0).withSecond(0).minusHours(3)));
         variables.put("check_clm_cycle", "PT6H");
 
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey(CAMPAIGN_PROCESS_DEFINITION_KEY,
-                campaign.getCampaignCode(), variables);
-        log.info("Run process {} for campaign {} ", pi.getId(), campaign.getCampaignCode());
-
+        CompletableFuture.runAsync(() -> {
+            ProcessInstance pi = runtimeService.startProcessInstanceByKey(CAMPAIGN_PROCESS_DEFINITION_KEY,
+                    dto.getCampaignCode(), variables);
+            log.info("Run process {} for campaign {} ", pi.getId(), dto.getCampaignCode());
+        });
         return campaign;
     }
 
