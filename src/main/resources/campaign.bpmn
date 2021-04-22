@@ -16,10 +16,10 @@
       <bpmn:signalEventDefinition signalRef="NewRequestSignal" />
     </bpmn:startEvent>
     <bpmn:serviceTask id="FreezeTask" name="Заморозка" camunda:delegateExpression="${freezeTask}">
-      <bpmn:incoming>StartCampaignEvent</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_03c7v8l</bpmn:incoming>
       <bpmn:outgoing>FreezeDoneEvent</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="StartCampaignEvent" sourceRef="StartEvent" targetRef="FreezeTask" />
+    <bpmn:sequenceFlow id="StartCampaignEvent" sourceRef="StartEvent" targetRef="IntermediateCatchEvent_03z43lf" />
     <bpmn:serviceTask id="SendToComarchTask" name="Отправка в comarch" camunda:delegateExpression="${sendToComarchTask}">
       <bpmn:incoming>SetRuleEvent</bpmn:incoming>
       <bpmn:outgoing>SendToComarchDoneEvent</bpmn:outgoing>
@@ -101,6 +101,14 @@
       <bpmn:outgoing>SequenceFlow_0z434os</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_0z434os" sourceRef="FinalCheckUpcTask" targetRef="CampaignEndEvent" />
+    <bpmn:intermediateCatchEvent id="IntermediateCatchEvent_03z43lf" name="Задержка перед запуском">
+      <bpmn:incoming>StartCampaignEvent</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_03c7v8l</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_03c7v8l" sourceRef="IntermediateCatchEvent_03z43lf" targetRef="FreezeTask" />
   </bpmn:process>
   <bpmn:signal id="NewRequestSignal" name="New Request Signal" />
   <bpmn:message id="Message_1u26c96" name="Message_0lhdq8n" />
@@ -119,23 +127,23 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_0dn9f6s_di" bpmnElement="FreezeTask">
-        <dc:Bounds x="274" y="80" width="100" height="80" />
+        <dc:Bounds x="301" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0sfxxs4_di" bpmnElement="StartCampaignEvent">
         <di:waypoint xsi:type="dc:Point" x="209" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="274" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="236" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="196.5" y="99" width="90" height="12" />
+          <dc:Bounds x="177.5" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_135hh3e_di" bpmnElement="SendToComarchTask">
         <dc:Bounds x="522" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_14wfhd6_di" bpmnElement="FreezeDoneEvent">
-        <di:waypoint xsi:type="dc:Point" x="374" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="401" y="120" />
         <di:waypoint xsi:type="dc:Point" x="426" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="355" y="99" width="90" height="12" />
+          <dc:Bounds x="368.5" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_10d85wr_di" bpmnElement="SendToComarchDoneEvent">
@@ -290,6 +298,19 @@
         <di:waypoint xsi:type="dc:Point" x="1644" y="120" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1630" y="99" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_03z43lf_di" bpmnElement="IntermediateCatchEvent_03z43lf">
+        <dc:Bounds x="236" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="212" y="52" width="83" height="36" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_03c7v8l_di" bpmnElement="SequenceFlow_03c7v8l">
+        <di:waypoint xsi:type="dc:Point" x="272" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="301" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="286.5" y="99" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
