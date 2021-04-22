@@ -14,8 +14,9 @@ import java.util.UUID;
 @Table(name = "guest")
 public class Guest {
     @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     @Column(name = "guest_id")
-    private UUID id;
+    private Long id;
 
     @Column(name = "guest_code")
     private Long code;
@@ -30,7 +31,6 @@ public class Guest {
     private String communicationStatus;
 
     public Guest(Long code, UUID segmentId) {
-        this.id = UUID.randomUUID();
         this.code = code;
         this.segmentId = segmentId;
     }
