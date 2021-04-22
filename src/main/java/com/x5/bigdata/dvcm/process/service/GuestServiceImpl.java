@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ public class GuestServiceImpl implements GuestService {
     @Override
     @Transactional
     public void save(UUID segmentId, List<Long> guests) {
+        guests = guests.stream().distinct().collect(Collectors.toList());
         int size = guests.size();
         int i0 = 0;
         while (i0 < size) {
