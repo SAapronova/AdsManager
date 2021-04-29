@@ -1,6 +1,5 @@
 package com.x5.bigdata.dvcm.process.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
@@ -25,7 +24,6 @@ public class CheckUpcTask implements JavaDelegate {
 
     private final CampaignService campaignService;
     private final GuestService guestService;
-    private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
     @Override
@@ -44,7 +42,7 @@ public class CheckUpcTask implements JavaDelegate {
                             .guests(codes)
                             .build();
 
-                    log.info("CheckUpcTask request: {} ", objectMapper.writeValueAsString(dto));
+                    log.info("CheckUpcTask request: {} ", dto);
                     Map<String, String> statuses = restTemplate.postForObject(URL, dto, HashMap.class);
                     log.info("CheckUpcTask response: {} ", statuses);
 

@@ -1,6 +1,5 @@
 package com.x5.bigdata.dvcm.process.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.x5.bigdata.dvcm.process.dto.ContentParamsDto;
 import com.x5.bigdata.dvcm.process.dto.MechanicsParamsDto;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
@@ -29,7 +28,6 @@ public class SendToUpcTask implements JavaDelegate {
     private final CampaignService campaignService;
     private final SegmentService segmentService;
     private final GuestService guestService;
-    private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
     @Override
@@ -72,7 +70,7 @@ public class SendToUpcTask implements JavaDelegate {
                             .guests(codes)
                             .build();
 
-                    log.info("SendToUpcTask request: {} ", objectMapper.writeValueAsString(dto));
+                    log.info("SendToUpcTask request: {} ", dto);
                     restTemplate.postForObject(URL, dto, String.class);
                     segmentService.setIsUpc(segment.getId());
                 }

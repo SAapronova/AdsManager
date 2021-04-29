@@ -3,9 +3,11 @@ package com.x5.bigdata.dvcm.process.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import lombok.ToString;
 
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@ToString
 public class MechanicsParamsDto {
     @JsonProperty("OFFER_POINT_COEFFICIENT")
     private Integer multiplier;

@@ -65,7 +65,7 @@ public class SendToComarchTask implements JavaDelegate {
                             .guests(codes)
                             .build();
 
-                    log.info("SendToComarchTask request: {} ", objectMapper.writeValueAsString(dto));
+                    log.info("SendToComarchTask request: {} ", dto);
                     ComarchRuleDto ruleDto = restTemplate.postForObject(URL, dto, ComarchRuleDto.class);
                     log.info("SendToComarchTask responce: {} ", objectMapper.writeValueAsString(ruleDto));
 

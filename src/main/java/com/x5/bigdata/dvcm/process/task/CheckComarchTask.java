@@ -1,6 +1,5 @@
 package com.x5.bigdata.dvcm.process.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.x5.bigdata.dvcm.process.dto.ComarchStatusDto;
 import com.x5.bigdata.dvcm.process.dto.MechanicsParamsDto;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
@@ -25,7 +24,6 @@ public class CheckComarchTask implements JavaDelegate {
 
     private final CampaignService campaignService;
     private final SegmentService segmentService;
-    private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
     @Override
@@ -53,7 +51,7 @@ public class CheckComarchTask implements JavaDelegate {
                                 .build())
                         .build();
 
-                log.info("CheckComarchTask request: {} ", objectMapper.writeValueAsString(dto));
+                log.info("CheckComarchTask request: {} ", dto);
                 ComarchStatusDto statusDto = restTemplate.postForObject(URL, dto, ComarchStatusDto.class);
                 log.info("CheckComarchTask response: {} ", statusDto);
 

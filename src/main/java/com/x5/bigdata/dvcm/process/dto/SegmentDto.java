@@ -10,6 +10,8 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.lang.String.format;
+
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SegmentDto {
@@ -47,4 +49,24 @@ public class SegmentDto {
 
     @JsonProperty("image_url")
     private String imageUrl;
+
+    @Override
+    public String toString() {
+        return format("{" +
+                        "camp_id: %s," +
+                        "segment_type: %s," +
+                        "channel: %s," +
+                        "date_start: %s," +
+                        "date_end: %s," +
+                        "guest_count: %s," +
+                        "mechanics: %s," +
+                        "mechanics_params: %s," +
+                        "content: %s," +
+                        "phones: %s," +
+                        "image_url: %s" +
+                        "}",
+                campaignCode, segmentType, channelType, periodStart, periodEnd,
+                (guests != null) ? guests.size() : 0,
+                mechanics, mechanicsParams, contentParams, phones, imageUrl);
+    }
 }

@@ -1,6 +1,5 @@
 package com.x5.bigdata.dvcm.process.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
 import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
@@ -26,7 +25,6 @@ public class FreezeTask implements JavaDelegate {
 
     private final CampaignService campaignService;
     private final GuestService guestService;
-    private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
     @Override
@@ -48,7 +46,7 @@ public class FreezeTask implements JavaDelegate {
                         .guests(codes)
                         .build();
 
-                log.info("FreezeTask request: {} ", objectMapper.writeValueAsString(dto));
+                log.info("FreezeTask request: {} ", dto);
                 Map<String, Boolean> statuses = restTemplate.postForObject(URL, dto, HashMap.class);
                 log.info("FreezeTask response: {} ", statuses);
 
