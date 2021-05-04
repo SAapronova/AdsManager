@@ -7,5 +7,8 @@ public enum SegmentType {
     CONTROL_GROUP,
 
     @JsonProperty("2")
-    TARGET_GROUP
+    TARGET_GROUP,
+
+    @JsonProperty("6")
+    TEST_COMMUNICATION
 }

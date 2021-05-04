@@ -1,12 +1,16 @@
 package com.x5.bigdata.dvcm.process.service;
 
 import com.x5.bigdata.dvcm.process.dto.CampaignDto;
+import com.x5.bigdata.dvcm.process.dto.TestCommunicationDto;
+import com.x5.bigdata.dvcm.process.dto.TestCommunicationSegmentDto;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
 import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
+import com.x5.bigdata.dvcm.process.entity.Segment;
+import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import com.x5.bigdata.dvcm.process.exception.ValidationException;
 import com.x5.bigdata.dvcm.process.exception.ValidationItem;
 import com.x5.bigdata.dvcm.process.repository.CampaignRepository;
-import com.x5.bigdata.dvcm.process.task.UnfreezeTask;
+import com.x5.bigdata.dvcm.process.task.TestCommunicationSenderToUpc;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,9 +26,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.x5.bigdata.dvcm.process.service.CampaignServiceImpl.CAMPAIGN_PROCESS_DEFINITION_KEY;
+import static com.x5.bigdata.dvcm.process.service.CampaignServiceImpl.CAMPAIGN_TEST_COMMUNICATION_ATTRIBUTE;
 import static com.x5.bigdata.dvcm.process.validators.ValidationMessages.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -48,6 +55,8 @@ class CampaignServiceImplTest {
     private TemplateDefinitionService templateDefinitionService;
     @MockBean
     private KafkaService kafkaService;
+    @MockBean
+    private TestCommunicationSenderToUpc senderToUpc;
 
     @Mock
     ProcessInstance processInstance;
@@ -57,7 +66,9 @@ class CampaignServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        campaign = new Campaign().setCampaignCode(CAMPAIGN_CODE);
+        campaign = new Campaign()
+                .setId(UUID.randomUUID())
+                .setCampaignCode(CAMPAIGN_CODE);
         campaignDto = CampaignDto.builder()
                 .campaignCode(CAMPAIGN_CODE)
                 .periodStart(LocalDateTime.of(2021, 1, 10, 0, 0))
@@ -168,5 +179,62 @@ class CampaignServiceImplTest {
         assertEquals("date_postperiod", item.getName());
         assertEquals(campaignDto.getPostPeriodEnd().toString(), item.getValue());
         assertEquals(WRONG_POST_PERIOD, item.getDescription());
+    }
+
+    @Test
+    public void testCommunication() {
+        TestCommunicationDto dto = getTestCommunicationDto();
+
+        campaign.setCampaignCode(dto.getCampaignCode())
+                .setSegments(List.of(
+                        new Segment().setId(UUID.randomUUID()), new Segment().setId(UUID.randomUUID())));
+
+        when(campaignRepository.findMaxLaunchCount(dto.getCampaignCode() + CAMPAIGN_TEST_COMMUNICATION_ATTRIBUTE)).thenReturn(5);
+
+        Campaign result = campaignService.createTestCommunication(dto);
+
+        assertEquals(dto.getPeriodStart(), result.getPeriodStart());
+        assertEquals(dto.getPeriodEnd(), result.getPeriodEnd());
+        assertEquals(dto.getCampaignCode() + "-test", result.getCampaignCode());
+        assertEquals(6, result.getLaunchCount());
+
+        verify(campaignRepository, times(1)).save(result);
+        verify(segmentService, times(1)).saveTestCommunicationSegment(result.getId(), dto.getSegments());
+    }
+
+    @Test
+    public void testCommunication_LikeFirstCampaign() {
+        TestCommunicationDto dto = getTestCommunicationDto();
+
+        campaign.setCampaignCode(dto.getCampaignCode())
+                .setSegments(List.of(
+                        new Segment().setId(UUID.randomUUID()), new Segment().setId(UUID.randomUUID())));
+
+        when(campaignRepository.findMaxLaunchCount(dto.getCampaignCode() + CAMPAIGN_TEST_COMMUNICATION_ATTRIBUTE)).thenReturn(null);
+
+        Campaign result = campaignService.createTestCommunication(dto);
+
+        assertEquals(dto.getPeriodStart(), result.getPeriodStart());
+        assertEquals(dto.getPeriodEnd(), result.getPeriodEnd());
+        assertEquals(dto.getCampaignCode() + "-test", result.getCampaignCode());
+        assertEquals(1, result.getLaunchCount());
+
+        verify(campaignRepository, times(1)).save(result);
+        verify(segmentService, times(1)).saveTestCommunicationSegment(result.getId(), dto.getSegments());
+    }
+
+    private TestCommunicationDto getTestCommunicationDto() {
+        return TestCommunicationDto
+                .builder()
+                .campaignCode("123")
+                .periodStart(LocalDateTime.MIN)
+                .periodEnd(LocalDateTime.MAX)
+                .segments(
+                        List.of(
+                                TestCommunicationSegmentDto
+                                        .builder()
+                                        .segmentType(SegmentType.TEST_COMMUNICATION)
+                                        .build()))
+                .build();
     }
 }

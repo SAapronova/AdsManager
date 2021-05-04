@@ -18,11 +18,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SendToUpcTask implements JavaDelegate {
+public class SendToUpcTask implements JavaDelegate, TestCommunicationSenderToUpc {
     private static final String URL = "/cvm_upc/communications/";
 
     private final CampaignService campaignService;
@@ -78,5 +79,36 @@ public class SendToUpcTask implements JavaDelegate {
         }
         campaignService.setStatus(campaignCode, CampaignStatus.UPC);
         log.info("End SendToUpcTask for campaign {} ", campaignCode);
+    }
+
+    @Override
+    public void send(UUID id) {
+        Campaign campaign = campaignService.getById(id);
+
+        for (Segment segment : campaign.getSegments()) {
+            List<Long> codes = guestService.getCodesBySegmentId(segment.getId());
+            if (!codes.isEmpty()) {
+                SegmentDto dto = SegmentDto.builder()
+                        .campaignCode(campaign.getCampaignCode() + campaign.getLaunchCount())
+                        .periodStart(campaign.getPeriodStart())
+                        .periodEnd(campaign.getPeriodEnd())
+                        .segmentType(segment.getType())
+                        .channelType(segment.getChannelType())
+                        .contentParams(ContentParamsDto.builder()
+                                .contentText(segment.getContentText())
+                                .contentLinkText(segment.getContentLinkText())
+                                .contentLink(segment.getContentLink())
+                                .contentTemplate(segment.getContentText())
+                                .imageUrl(segment.getImageUrl())
+                                .build())
+                        .phones(segment.getTestPhones())
+                        .guests(codes)
+                        .build();
+
+                log.info("TestCommunicationSenderToUpc request: {} ", dto);
+                restTemplate.postForObject(URL, dto, String.class);
+            }
+        }
+        log.info("End TestCommunicationSenderToUpc for campaign {} ", campaign.getCampaignCode());
     }
 }

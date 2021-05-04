@@ -2,45 +2,64 @@ package com.x5.bigdata.dvcm.process.service;
 
 import com.x5.bigdata.dvcm.process.dto.CampaignDto;
 import com.x5.bigdata.dvcm.process.dto.CampaignInfoDto;
+import com.x5.bigdata.dvcm.process.dto.TestCommunicationDto;
 import com.x5.bigdata.dvcm.process.dto.mapper.CampaignInfoDtoMapper;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
 import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
 import com.x5.bigdata.dvcm.process.exception.ValidationException;
 import com.x5.bigdata.dvcm.process.exception.ValidationItem;
 import com.x5.bigdata.dvcm.process.repository.CampaignRepository;
-import com.x5.bigdata.dvcm.process.task.UnfreezeTask;
-import lombok.RequiredArgsConstructor;
+import com.x5.bigdata.dvcm.process.task.TestCommunicationSenderToUpc;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.x5.bigdata.dvcm.process.validators.ValidationMessages.*;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class CampaignServiceImpl implements CampaignService {
     public static final String CAMPAIGN_PROCESS_DEFINITION_KEY = "CampaignProcess";
+    public static final String CAMPAIGN_TEST_COMMUNICATION_ATTRIBUTE = "-test";
+
     private final CampaignRepository campaignRepository;
     private final SegmentService segmentService;
     private final RuntimeService runtimeService;
     private final TemplateDefinitionService templateDefinitionService;
     private final KafkaService kafkaService;
+    private final TestCommunicationSenderToUpc senderToUpc;
+
+    public CampaignServiceImpl(CampaignRepository campaignRepository,
+                               SegmentService segmentService,
+                               RuntimeService runtimeService,
+                               TemplateDefinitionService templateDefinitionService,
+                               KafkaService kafkaService,
+                               @Lazy TestCommunicationSenderToUpc senderToUpc) {
+        this.campaignRepository = campaignRepository;
+        this.segmentService = segmentService;
+        this.runtimeService = runtimeService;
+        this.templateDefinitionService = templateDefinitionService;
+        this.kafkaService = kafkaService;
+        this.senderToUpc = senderToUpc;
+    }
 
     @Transactional
     public Campaign getByCode(String campaignCode) {
         return campaignRepository.findCampaignByCampaignCode(campaignCode);
+    }
+
+    @Transactional
+    public Campaign getById(UUID id) {
+        return campaignRepository.findById(id).orElseThrow();
     }
 
     @Transactional
@@ -112,5 +131,30 @@ public class CampaignServiceImpl implements CampaignService {
     @Transactional
     public List<CampaignInfoDto> findAll() {
         return campaignRepository.findAll().stream().map(CampaignInfoDtoMapper::map).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public Campaign createTestCommunication(TestCommunicationDto dto) {
+        Integer maxLaunchCount = campaignRepository
+                .findMaxLaunchCount(dto.getCampaignCode() + CAMPAIGN_TEST_COMMUNICATION_ATTRIBUTE);
+
+        Campaign newCampaign = new Campaign()
+                .setId(UUID.randomUUID())
+                .setCampaignCode(dto.getCampaignCode() + CAMPAIGN_TEST_COMMUNICATION_ATTRIBUTE)
+                .setCreateTime(LocalDateTime.now())
+                .setPeriodStart(dto.getPeriodStart())
+                .setPeriodEnd(dto.getPeriodEnd())
+                .setLaunchCount(maxLaunchCount == null ? 1 : maxLaunchCount + 1);
+
+        campaignRepository.save(newCampaign);
+        segmentService.saveTestCommunicationSegment(newCampaign.getId(), dto.getSegments());
+        log.info("Save new campaign: {}", newCampaign);
+
+        CompletableFuture.runAsync(() -> {
+            senderToUpc.send(newCampaign.getId());
+        });
+
+        return newCampaign;
     }
 }

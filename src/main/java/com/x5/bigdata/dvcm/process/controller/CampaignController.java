@@ -2,6 +2,7 @@ package com.x5.bigdata.dvcm.process.controller;
 
 import com.x5.bigdata.dvcm.process.dto.CampaignDto;
 import com.x5.bigdata.dvcm.process.dto.CampaignInfoDto;
+import com.x5.bigdata.dvcm.process.dto.TestCommunicationDto;
 import com.x5.bigdata.dvcm.process.service.CampaignService;
 import com.x5.bigdata.dvcm.process.task.UnfreezeTask;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,4 +42,11 @@ public class CampaignController {
         unfreezeTask.unfreeze(campId);
         return true;
     }
+
+    @PostMapping("/test-communications")
+    public boolean testCommunication(@RequestBody @Valid TestCommunicationDto dto) {
+        campaignService.createTestCommunication(dto);
+        return true;
+    }
+
 }
