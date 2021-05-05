@@ -48,7 +48,8 @@ public class FreezeTask implements JavaDelegate {
 
                 log.info("FreezeTask request: {} ", dto);
                 Map<String, Boolean> statuses = restTemplate.postForObject(URL, dto, HashMap.class);
-                log.info("FreezeTask response: {} ", statuses);
+                log.info("FreezeTask frozen: {} ",
+                        statuses.entrySet().stream().filter(entry -> entry.getValue()).count());
 
                 guestService.setFrozen(segment.getId(), statuses);
             }

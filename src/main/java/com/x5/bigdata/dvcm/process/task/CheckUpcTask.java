@@ -44,7 +44,7 @@ public class CheckUpcTask implements JavaDelegate {
 
                     log.info("CheckUpcTask request: {} ", dto);
                     Map<String, String> statuses = restTemplate.postForObject(URL, dto, HashMap.class);
-                    log.info("CheckUpcTask response: {} ", statuses);
+                    log.info("CheckUpcTask response: {} ", statuses.size());
 
                     guestService.setUpcStatus(segment.getId(), statuses);
                 }
