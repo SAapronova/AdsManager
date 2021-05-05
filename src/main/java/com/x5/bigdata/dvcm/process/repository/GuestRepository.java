@@ -16,6 +16,9 @@ public interface GuestRepository extends JpaRepository<Guest, UUID> {
     @Query("select code from Guest where segmentId = :segmentId ")
     List<Long> getCodesBySegmentId(@Param("segmentId") UUID segmentId);
 
+    @Query("select code from Guest where segmentId = :segmentId and isFrozen ")
+    List<Long> getFrozenCodesBySegmentId(@Param("segmentId") UUID segmentId);
+
     @Modifying
     @Query("update Guest set isFrozen = :isFrozen where code = :code and segmentId = :segmentId")
     void setFrozen(@Param(value = "segmentId") UUID segmentId,

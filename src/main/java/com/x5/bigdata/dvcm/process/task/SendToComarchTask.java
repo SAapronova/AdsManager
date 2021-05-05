@@ -45,7 +45,7 @@ public class SendToComarchTask implements JavaDelegate {
 
         for (Segment segment : campaign.getSegments()) {
             if (!SegmentType.CONTROL_GROUP.equals(segment.getType())) {
-                List<Long> codes = guestService.getCodesBySegmentId(segment.getId());
+                List<Long> codes = guestService.getFrozenCodesBySegmentId(segment.getId());
 
                 if (!codes.isEmpty()) {
                     SegmentDto dto = SegmentDto.builder()

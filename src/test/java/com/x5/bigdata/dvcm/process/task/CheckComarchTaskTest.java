@@ -89,6 +89,8 @@ class CheckComarchTaskTest {
         when(campaignService.getByCode(CAMPAIGN_CODE)).thenReturn(getCampaign());
         when(guestService.getCodesBySegmentId(TARGET_SEGMENT_ID)).thenReturn(List.of(1L, 2L));
         when(guestService.getCodesBySegmentId(CONTROL_SEGMENT_ID)).thenReturn(List.of(3L, 4L));
+        when(guestService.getFrozenCodesBySegmentId(TARGET_SEGMENT_ID)).thenReturn(List.of(1L, 2L));
+        when(guestService.getFrozenCodesBySegmentId(CONTROL_SEGMENT_ID)).thenReturn(List.of(3L, 4L));
 
         checkComarchTask.execute(execution);
 

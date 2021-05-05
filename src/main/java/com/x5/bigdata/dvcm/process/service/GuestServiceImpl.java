@@ -36,6 +36,11 @@ public class GuestServiceImpl implements GuestService {
     }
 
     @Override
+    public List<Long> getFrozenCodesBySegmentId(UUID segmentId) {
+        return guestRepository.getFrozenCodesBySegmentId(segmentId);
+    }
+
+    @Override
     @Transactional
     public void setFrozen(UUID segmentId, Map<String, Boolean> statuses) {
         statuses.entrySet().forEach(entry ->
