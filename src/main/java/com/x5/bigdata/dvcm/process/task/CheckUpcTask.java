@@ -34,12 +34,14 @@ public class CheckUpcTask implements JavaDelegate {
         for (Segment segment : campaignService.getByCode(campaignCode).getSegments()) {
             if (!SegmentType.CONTROL_GROUP.equals(segment.getType())) {
                 List<Long> codes = guestService.getFrozenCodesBySegmentId(segment.getId());
-
-                if (!codes.isEmpty()) {
+                int guestCount = codes.size();
+                int i0 = 0;
+                while (i0 < guestCount) {
+                    int i1 = Math.min(guestCount, i0 + 5000);
                     SegmentDto dto = SegmentDto.builder()
                             .campaignCode(campaignCode)
                             .channelType(segment.getChannelType())
-                            .guests(codes)
+                            .guests(codes.subList(i0, i1))
                             .build();
 
                     log.info("CheckUpcTask request: {} ", dto);
@@ -47,6 +49,7 @@ public class CheckUpcTask implements JavaDelegate {
                     log.info("CheckUpcTask response: {} ", statuses.size());
 
                     guestService.setUpcStatus(segment.getId(), statuses);
+                    i0 = i1;
                 }
             }
         }
