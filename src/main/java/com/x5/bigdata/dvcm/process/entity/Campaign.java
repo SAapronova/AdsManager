@@ -46,4 +46,7 @@ public class Campaign {
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "campaign_id", updatable = false, insertable = false)
     private List<Segment> segments = new ArrayList<>();
+
+    @Column(name = "launch_count")
+    private Integer launchCount;
 }

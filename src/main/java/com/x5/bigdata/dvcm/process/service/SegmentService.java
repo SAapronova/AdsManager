@@ -2,6 +2,7 @@ package com.x5.bigdata.dvcm.process.service;
 
 import com.x5.bigdata.dvcm.process.dto.ComarchStatusDto;
 import com.x5.bigdata.dvcm.process.dto.CampaignSegmentDto;
+import com.x5.bigdata.dvcm.process.dto.TestCommunicationSegmentDto;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,4 +16,6 @@ public interface SegmentService {
     void setRuleCode(UUID segmentId, String ruleCode);
 
     void setIsUpc(UUID segmentId);
+
+    void saveTestCommunicationSegment(UUID campaignId, List<TestCommunicationSegmentDto> segments);
 }
