@@ -6,11 +6,10 @@ spec:
   selector:
     matchLabels:
       app: dcvm-process-manager
-  replicas: 2
+  replicas: 1
   strategy:
     rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
+      maxUnavailable: 0
     type: RollingUpdate
   template:
     metadata:
@@ -23,7 +22,7 @@ spec:
     spec:
       containers:
         - name: dcvm-process-manager
-          image: {IMAGE_VERSION}
+          image: ${IMAGE_NAME}
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -51,32 +50,32 @@ spec:
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: dcvm-campaigner-secret
-                  key: srv.dcvm.password
+                  name: cvm-secret
+                  key: srv.dcvm.prod.password
             - name: SPRING_MAIL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: dcvm-campaigner-secret
-                  key: srv.dcvm.password
+                  name: cvm-secret
+                  key: srv.dcvm.prod.password
             - name: STORAGE_S3_SERVER_KEY_ACCESS
               valueFrom:
                 secretKeyRef:
-                  name: dcvm-campaigner-secret
+                  name: cvm-secret
                   key: s3.key.access
             - name: STORAGE_S3_SERVER_KEY_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: dcvm-campaigner-secret
+                  name: cvm-secret
                   key: s3.key.secret
             - name: STORAGE_DMP_S3_SERVER_KEY_ACCESS
               valueFrom:
                 secretKeyRef:
-                  name: dcvm-s3-dmp-secret
+                  name: cvm-s3-dmp-secret
                   key: s3.key.access
             - name: STORAGE_DMP_S3_SERVER_KEY_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: dcvm-s3-dmp-secret
+                  name: cvm-s3-dmp-secret
                   key: s3.key.secret
             - name: JIRA_LOGIN
               valueFrom:
@@ -88,12 +87,15 @@ spec:
                 secretKeyRef:
                   name: jira-secrets
                   key: jira.password
-            - name: DEPLOY_TIME
-              value: {DEPLOY_DATE}
-            - name: KEYTAB_PATH
-              value: /app/secrets/srv.dcvm.keytab
+            - name: KAFKA_TOPIC
+              valueFrom:
+                secretKeyRef:
+                  name: cvm-secret
+                  key: kafka_topic
             - name: KRB_USER
-              value: srv.dcvm
+              value: srv.bdrs-prd
+            - name: KEYTAB_PATH
+              value: /app/secrets/srv.bdrs-prd.keytab
           volumeMounts:
             - name: keytab
               mountPath: /app/secrets
@@ -105,14 +107,14 @@ spec:
               mountPath: /app/config
               readOnly: true
       imagePullSecrets:
-        - name: gitlab-registry
+        - name: gitlab-token-all
       volumes:
         - name: krb5-conf
           secret:
             secretName: krb5-conf
         - name: keytab
           secret:
-            secretName: srv-dcvm-keytab
+            secretName: srv.bdrs-prd.keytab
         - name: application-config
           configMap:
             name: dcvm-process-manager
@@ -121,17 +123,17 @@ spec:
                 path: application.properties
         - name: application-secrets
           secret:
-            secretName: dcvm-campaigner-secret
+            secretName: cvm-secret
             items:
-              - key: srv.dcvm.password
-                path: srv.dcvm.password
+              - key: srv.dcvm.prod.password
+                path: srv.dcvm.prod.password
               - key: s3.key.access
                 path: s3.key.access
               - key: s3.key.secret
                 path: s3.key.secret
-        - name: dcvm-s3-dmp-secret
+        - name: cvm-s3-dmp-secret
           secret:
-            secretName: dcvm-s3-dmp-secret
+            secretName: cvm-s3-dmp-secret
             items:
               - key: s3.key.access
                 path: s3.key.access

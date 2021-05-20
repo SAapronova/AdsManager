@@ -50,6 +50,18 @@ deploy:release:
     DEPLOY_CONFIG_FILE_NAME: "application.properties"
   extends: .deploy
 
+deploy:prod:
+  variables:
+    KUBE_CONFIG: "${KUBE_CONFIG_PROD}"
+    DEPLOY_K8S_DIR: "k8s/prod"
+    DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
+    NAMESPACE: "cvm-prod"
+    DEPLOY_CONFIGMAP: "true"
+    DEPLOY_CONFIG_FILE_PATH: "config/application-prod.properties"
+    DEPLOY_CONFIGMAP_NAME: "${CI_PROJECT_NAME}"
+    DEPLOY_CONFIG_FILE_NAME: "application.properties"
+  extends: .deploy
+
 deploy:demo:
   variables:
     KUBE_CONFIG: "${KUBE_CONFIG_DEV}"
