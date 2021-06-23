@@ -1,75 +1,17 @@
 include:
   - project: dcvm5/ci-templates
+    ref: develop
     file: /AutoDeploy.gitlab-ci.yml
 
 variables:
+  SONAR_JAVA_BINARIES_PATH: "src/main/java/com/x5/bigdata/dvcm/process"
   BUILD: "TRUE"
   BUILD_IMAGE: "TRUE"
-  LINTER: "TRUE"
+  LINTER: "FALSE"
   DEPLOY: "TRUE"
-
-stages:
-  - build
-  - linter
-  - build-image
-  - deploy
 
 deploy:dev:
   variables:
     KUBE_CONFIG: "${KUBE_CONFIG_DEV}"
-    DEPLOY_K8S_DIR: "k8s/test"
-    DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
-    NAMESPACE: "cvm-dev"
-    DEPLOY_CONFIGMAP: "true"
-    DEPLOY_CONFIG_FILE_PATH: "config/application-dev.properties"
-    DEPLOY_CONFIGMAP_NAME: "${CI_PROJECT_NAME}"
-    DEPLOY_CONFIG_FILE_NAME: "application.properties"
-  extends: .deploy
-
-deploy:test:
-  variables:
-    KUBE_CONFIG: "${KUBE_CONFIG_DEV}"
-    DEPLOY_K8S_DIR: "k8s/test"
-    DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
-    NAMESPACE: "cvm-test"
-    DEPLOY_CONFIGMAP: "true"
-    DEPLOY_CONFIG_FILE_PATH: "config/application-test.properties"
-    DEPLOY_CONFIGMAP_NAME: "${CI_PROJECT_NAME}"
-    DEPLOY_CONFIG_FILE_NAME: "application.properties"
-  extends: .deploy
-
-deploy:release:
-  variables:
-    KUBE_CONFIG: "${KUBE_CONFIG_DEV}"
-    DEPLOY_K8S_DIR: "k8s/test"
-    DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
-    NAMESPACE: "release"
-    DEPLOY_CONFIGMAP: "true"
-    DEPLOY_CONFIG_FILE_PATH: "config/application-release.properties"
-    DEPLOY_CONFIGMAP_NAME: "${CI_PROJECT_NAME}"
-    DEPLOY_CONFIG_FILE_NAME: "application.properties"
-  extends: .deploy
-
-deploy:prod:
-  variables:
-    KUBE_CONFIG: "${KUBE_CONFIG_PROD}"
-    DEPLOY_K8S_DIR: "k8s/prod"
-    DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
-    NAMESPACE: "cvm-prod"
-    DEPLOY_CONFIGMAP: "true"
-    DEPLOY_CONFIG_FILE_PATH: "config/application-prod.properties"
-    DEPLOY_CONFIGMAP_NAME: "${CI_PROJECT_NAME}"
-    DEPLOY_CONFIG_FILE_NAME: "application.properties"
-  extends: .deploy
-
-deploy:demo:
-  variables:
-    KUBE_CONFIG: "${KUBE_CONFIG_DEV}"
-    DEPLOY_K8S_DIR: "k8s/test"
-    DEPLOY_K8S_DEPLOYMENT: "deployment.yml"
-    NAMESPACE: "cvm-demo"
-    DEPLOY_CONFIGMAP: "true"
-    DEPLOY_CONFIG_FILE_PATH: "config/application-demo.properties"
-    DEPLOY_CONFIGMAP_NAME: "${CI_PROJECT_NAME}"
-    DEPLOY_CONFIG_FILE_NAME: "application.properties"
+    STAND: dev
   extends: .deploy
