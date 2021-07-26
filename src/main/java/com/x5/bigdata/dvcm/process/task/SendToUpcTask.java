@@ -10,29 +10,45 @@ import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import com.x5.bigdata.dvcm.process.service.CampaignService;
 import com.x5.bigdata.dvcm.process.service.GuestService;
 import com.x5.bigdata.dvcm.process.service.SegmentService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class SendToUpcTask implements JavaDelegate, TestCommunicationSenderToUpc {
-    private static final String URL = "/cvm_upc/communications/";
+    private static final String SEND_PATH = "/communications/";
 
     private final CampaignService campaignService;
     private final SegmentService segmentService;
     private final GuestService guestService;
     private final RestTemplate restTemplate;
+    private final URI uri;
 
+
+    public SendToUpcTask (CampaignService campaignService,
+                         GuestService guestService,
+                         RestTemplate restTemplate,
+                         SegmentService segmentService,
+                         @Value("${dcvm.upc.host:dcvm-upc-service}") String host,
+                         @Value("${dcvm.upc.port:8080}") Integer port) throws URISyntaxException {
+        this.campaignService = campaignService;
+        this.guestService = guestService;
+        this.restTemplate = restTemplate;
+        this.segmentService = segmentService;
+        uri = new URI("http", null, host, port, SEND_PATH, null, null);
+    }
     @Override
     public void execute(DelegateExecution execution) throws Exception {
+
         String campaignCode = execution.getProcessBusinessKey();
         log.info("Init SendToUpcTask for campaign {} ", campaignCode);
 
@@ -72,7 +88,7 @@ public class SendToUpcTask implements JavaDelegate, TestCommunicationSenderToUpc
                             .build();
 
                     log.info("SendToUpcTask request: {} ", dto);
-                    restTemplate.postForObject(URL, dto, String.class);
+                    restTemplate.postForObject(uri, dto, String.class);
                     segmentService.setIsUpc(segment.getId());
                 }
             }
@@ -106,7 +122,7 @@ public class SendToUpcTask implements JavaDelegate, TestCommunicationSenderToUpc
                         .build();
 
                 log.info("TestCommunicationSenderToUpc request: {} ", dto);
-                restTemplate.postForObject(URL, dto, String.class);
+                restTemplate.postForObject(uri, dto, String.class);
             }
         }
         log.info("End TestCommunicationSenderToUpc for campaign {} ", campaign.getCampaignCode());

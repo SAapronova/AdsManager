@@ -91,6 +91,7 @@ public class CampaignServiceImpl implements CampaignService {
         variables.put("post_period_end", Timestamp.valueOf(campaign.getPostPeriodEnd()
                 .plusDays(1).withHour(0).withMinute(0).withSecond(0).minusHours(3)));
         variables.put("check_clm_cycle", "PT6H");
+        variables.put("refresh_status_time", "P1D");
 
         CompletableFuture.runAsync(() -> {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey(CAMPAIGN_PROCESS_DEFINITION_KEY,

@@ -1,0 +1,1 @@
+ALTER TABLE guest ADD deferred_date timestamp NULL;

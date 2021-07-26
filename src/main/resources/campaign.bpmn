@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.11.3">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.9.0">
   <bpmn:process id="CampaignProcess" name="Процесс проведения кампании" isExecutable="true" camunda:versionTag="2.0.0">
     <bpmn:intermediateCatchEvent id="WaitStartCampaign" name="Ожидание 22:00 дня перед началом кампании">
       <bpmn:incoming>FreezeDoneEvent</bpmn:incoming>
@@ -48,35 +48,32 @@
     </bpmn:intermediateCatchEvent>
     <bpmn:serviceTask id="SendToUpcTask" name="Отправка в УПК" camunda:delegateExpression="${sendToUpcTask}">
       <bpmn:incoming>DelaySendToUpcDoneEvent</bpmn:incoming>
-      <bpmn:outgoing>SendToUpcDoneEvent</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1oaoqjb</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="DelaySendToUpcDoneEvent" sourceRef="DelaySendToUpc" targetRef="SendToUpcTask" />
-    <bpmn:serviceTask id="CheckUpcTask" name="Проверка&#10; УПК&#10;" camunda:delegateExpression="${checkUpcTask}">
-      <bpmn:incoming>SendToUpcDoneEvent</bpmn:incoming>
-      <bpmn:outgoing>CheckUpcDoneEvent</bpmn:outgoing>
+    <bpmn:serviceTask id="CheckUpcTask" name="Проверка&#10;УПК" camunda:delegateExpression="${checkUpcTask}">
+      <bpmn:incoming>Flow_0egrsv3</bpmn:incoming>
+      <bpmn:outgoing>Flow_1d5bmi8</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="SendToUpcDoneEvent" sourceRef="SendToUpcTask" targetRef="CheckUpcTask" />
     <bpmn:intermediateCatchEvent id="WaitCampaignEnd" name="Ожидание окончания компании">
-      <bpmn:incoming>WaitCampaignEndEvent</bpmn:incoming>
+      <bpmn:incoming>Flow_1tooulq</bpmn:incoming>
       <bpmn:outgoing>PostPeriodEndEvent</bpmn:outgoing>
       <bpmn:timerEventDefinition>
         <bpmn:timeDate xsi:type="bpmn:tFormalExpression">${post_period_end}</bpmn:timeDate>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
-    <bpmn:sequenceFlow id="CheckUpcDoneEvent" sourceRef="CheckUpcTask" targetRef="ExclusiveGateway_03na3za" />
     <bpmn:serviceTask id="UnfreezeTask" name="Разморозка" camunda:delegateExpression="${unfreezeTask}">
       <bpmn:incoming>PostPeriodEndEvent</bpmn:incoming>
       <bpmn:outgoing>UnfreezeDoneEvent</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="PostPeriodEndEvent" sourceRef="WaitCampaignEnd" targetRef="UnfreezeTask" />
-    <bpmn:sequenceFlow id="UnfreezeDoneEvent" sourceRef="UnfreezeTask" targetRef="FinalCheckUpcTask" />
     <bpmn:sequenceFlow id="SetRuleEvent" sourceRef="WaitStartCampaign" targetRef="SendToComarchTask" />
     <bpmn:parallelGateway id="ExclusiveGateway_03na3za">
-      <bpmn:incoming>CheckUpcDoneEvent</bpmn:incoming>
-      <bpmn:outgoing>WaitCampaignEndEvent</bpmn:outgoing>
+      <bpmn:incoming>Flow_04yc8wg</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1ttp8bq</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1d9cffr</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1tooulq</bpmn:outgoing>
     </bpmn:parallelGateway>
-    <bpmn:sequenceFlow id="WaitCampaignEndEvent" sourceRef="ExclusiveGateway_03na3za" targetRef="WaitCampaignEnd" />
     <bpmn:serviceTask id="CheckComarchStatusTask" name="Проверка статуса механики" camunda:delegateExpression="${checkComarchTask}">
       <bpmn:incoming>SequenceFlow_0pawltp</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_04prl6i</bpmn:outgoing>
@@ -92,15 +89,10 @@
     <bpmn:sequenceFlow id="SequenceFlow_1ttp8bq" sourceRef="ExclusiveGateway_03na3za" targetRef="WaitCheckMechanicsStatus" />
     <bpmn:sequenceFlow id="SequenceFlow_0pawltp" sourceRef="WaitCheckMechanicsStatus" targetRef="CheckComarchStatusTask" />
     <bpmn:endEvent id="CampaignEndEvent">
-      <bpmn:incoming>SequenceFlow_0z434os</bpmn:incoming>
+      <bpmn:incoming>Flow_1y51ec0</bpmn:incoming>
       <bpmn:terminateEventDefinition />
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_04prl6i" sourceRef="CheckComarchStatusTask" targetRef="WaitCheckMechanicsStatus" />
-    <bpmn:serviceTask id="FinalCheckUpcTask" name="Проверка&#10; УПК&#10;" camunda:delegateExpression="${checkUpcTask}">
-      <bpmn:incoming>UnfreezeDoneEvent</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_0z434os</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="SequenceFlow_0z434os" sourceRef="FinalCheckUpcTask" targetRef="CampaignEndEvent" />
     <bpmn:intermediateCatchEvent id="IntermediateCatchEvent_03z43lf" name="Задержка перед запуском">
       <bpmn:incoming>StartCampaignEvent</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_03c7v8l</bpmn:outgoing>
@@ -109,210 +101,245 @@
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
     <bpmn:sequenceFlow id="SequenceFlow_03c7v8l" sourceRef="IntermediateCatchEvent_03z43lf" targetRef="FreezeTask" />
+    <bpmn:intermediateCatchEvent id="Event_14femby" name="Таймаут ежедневного обновления">
+      <bpmn:incoming>Flow_1d9cffr</bpmn:incoming>
+      <bpmn:incoming>Flow_1d5bmi8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0egrsv3</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0nnjghz">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">${refresh_status_time}</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1d9cffr" sourceRef="ExclusiveGateway_03na3za" targetRef="Event_14femby" />
+    <bpmn:sequenceFlow id="Flow_1tooulq" sourceRef="ExclusiveGateway_03na3za" targetRef="WaitCampaignEnd" />
+    <bpmn:sequenceFlow id="UnfreezeDoneEvent" sourceRef="UnfreezeTask" targetRef="Activity_0owa8xd" />
+    <bpmn:serviceTask id="Activity_0owa8xd" name="Проверка&#10;УПК" camunda:delegateExpression="${checkUpcTask}">
+      <bpmn:incoming>UnfreezeDoneEvent</bpmn:incoming>
+      <bpmn:outgoing>Flow_1y51ec0</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1y51ec0" sourceRef="Activity_0owa8xd" targetRef="CampaignEndEvent" />
+    <bpmn:serviceTask id="Activity_0wxb5sn" name="Проверка&#10;УПК" camunda:delegateExpression="${checkUpcTask}">
+      <bpmn:incoming>Flow_1oaoqjb</bpmn:incoming>
+      <bpmn:outgoing>Flow_04yc8wg</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1oaoqjb" sourceRef="SendToUpcTask" targetRef="Activity_0wxb5sn" />
+    <bpmn:sequenceFlow id="Flow_04yc8wg" sourceRef="Activity_0wxb5sn" targetRef="ExclusiveGateway_03na3za" />
+    <bpmn:sequenceFlow id="Flow_0egrsv3" sourceRef="Event_14femby" targetRef="CheckUpcTask" />
+    <bpmn:sequenceFlow id="Flow_1d5bmi8" sourceRef="CheckUpcTask" targetRef="Event_14femby" />
   </bpmn:process>
   <bpmn:signal id="NewRequestSignal" name="New Request Signal" />
   <bpmn:message id="Message_1u26c96" name="Message_0lhdq8n" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CampaignProcess">
-      <bpmndi:BPMNShape id="IntermediateCatchEvent_1gxnv1u_di" bpmnElement="WaitStartCampaign">
-        <dc:Bounds x="426" y="102" width="36" height="36" />
+      <bpmndi:BPMNEdge id="SequenceFlow_03c7v8l_di" bpmnElement="SequenceFlow_03c7v8l">
+        <di:waypoint x="272" y="400" />
+        <di:waypoint x="301" y="400" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="406" y="142" width="88" height="24" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="StartEvent_08wc5do_di" bpmnElement="StartEvent">
-        <dc:Bounds x="173" y="102" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="146" y="143" width="90" height="24" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_0dn9f6s_di" bpmnElement="FreezeTask">
-        <dc:Bounds x="301" y="80" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0sfxxs4_di" bpmnElement="StartCampaignEvent">
-        <di:waypoint xsi:type="dc:Point" x="209" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="236" y="120" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="177.5" y="99" width="90" height="12" />
+          <dc:Bounds x="286.5" y="99" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_135hh3e_di" bpmnElement="SendToComarchTask">
-        <dc:Bounds x="522" y="80" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_14wfhd6_di" bpmnElement="FreezeDoneEvent">
-        <di:waypoint xsi:type="dc:Point" x="401" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="426" y="120" />
+      <bpmndi:BPMNEdge id="SequenceFlow_0x3usev_di" bpmnElement="SetRuleEvent">
+        <di:waypoint x="462" y="400" />
+        <di:waypoint x="522" y="400" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="368.5" y="99" width="90" height="12" />
+          <dc:Bounds x="492" y="99" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_10d85wr_di" bpmnElement="SendToComarchDoneEvent">
-        <di:waypoint xsi:type="dc:Point" x="622" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="673" y="120" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="647.5" y="99" width="0" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="IntermediateCatchEvent_0zvhz1i_di" bpmnElement="WaitComarch">
-        <dc:Bounds x="673" y="102" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="668" y="142" width="53" height="36" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_1qutb12_di" bpmnElement="CheckComarchTask">
-        <dc:Bounds x="749" y="80" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_06j3j97_di" bpmnElement="WaitComarchDoneEvent">
-        <di:waypoint xsi:type="dc:Point" x="709" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="749" y="120" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="729" y="99" width="0" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_1qy5g5c_di" bpmnElement="CheckCamarchDoneEvent">
-        <di:waypoint xsi:type="dc:Point" x="849" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="893" y="121" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="826" y="99.5" width="90" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="IntermediateCatchEvent_04nrwuh_di" bpmnElement="DelaySendToUpc">
-        <dc:Bounds x="893" y="103" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="868" y="148" width="86" height="24" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_0mo0fit_di" bpmnElement="SendToUpcTask">
-        <dc:Bounds x="964" y="80" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_10xhpww_di" bpmnElement="DelaySendToUpcDoneEvent">
-        <di:waypoint xsi:type="dc:Point" x="929" y="121" />
-        <di:waypoint xsi:type="dc:Point" x="964" y="120" />
+        <di:waypoint x="929" y="401" />
+        <di:waypoint x="964" y="400" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="901.5" y="99.5" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_134znnp_di" bpmnElement="CheckUpcTask">
-        <dc:Bounds x="1093" y="80" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0l8l4ll_di" bpmnElement="SendToUpcDoneEvent">
-        <di:waypoint xsi:type="dc:Point" x="1064" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1093" y="120" />
+      <bpmndi:BPMNEdge id="SequenceFlow_1qy5g5c_di" bpmnElement="CheckCamarchDoneEvent">
+        <di:waypoint x="849" y="400" />
+        <di:waypoint x="893" y="401" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1078.5" y="99" width="0" height="12" />
+          <dc:Bounds x="826" y="99.5" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="IntermediateCatchEvent_0h4ycqi_di" bpmnElement="WaitCampaignEnd">
-        <dc:Bounds x="1321" y="102" width="36" height="36" />
+      <bpmndi:BPMNEdge id="SequenceFlow_06j3j97_di" bpmnElement="WaitComarchDoneEvent">
+        <di:waypoint x="709" y="400" />
+        <di:waypoint x="749" y="400" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1312" y="147" width="54" height="36" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0r2e0d7_di" bpmnElement="CheckUpcDoneEvent">
-        <di:waypoint xsi:type="dc:Point" x="1193" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1238" y="120" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1170.5" y="99" width="90" height="12" />
+          <dc:Bounds x="729" y="99" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_1lytrqe_di" bpmnElement="UnfreezeTask">
-        <dc:Bounds x="1392" y="80" width="100" height="80" />
-      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_10d85wr_di" bpmnElement="SendToComarchDoneEvent">
+        <di:waypoint x="622" y="400" />
+        <di:waypoint x="673" y="400" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="647.5" y="99" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_14wfhd6_di" bpmnElement="FreezeDoneEvent">
+        <di:waypoint x="401" y="400" />
+        <di:waypoint x="426" y="400" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="368.5" y="99" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0sfxxs4_di" bpmnElement="StartCampaignEvent">
+        <di:waypoint x="209" y="400" />
+        <di:waypoint x="236" y="400" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="177.5" y="99" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1d9cffr_di" bpmnElement="Flow_1d9cffr">
+        <di:waypoint x="1330" y="375" />
+        <di:waypoint x="1330" y="288" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1tooulq_di" bpmnElement="Flow_1tooulq">
+        <di:waypoint x="1355" y="400" />
+        <di:waypoint x="1492" y="400" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1jqgjz7_di" bpmnElement="PostPeriodEndEvent">
-        <di:waypoint xsi:type="dc:Point" x="1357" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1392" y="120" />
+        <di:waypoint x="1528" y="400" />
+        <di:waypoint x="1590" y="400" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1329.5" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_01fmzll_di" bpmnElement="UnfreezeDoneEvent">
-        <di:waypoint xsi:type="dc:Point" x="1492" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1516" y="120" />
+        <di:waypoint x="1690" y="400" />
+        <di:waypoint x="1740" y="400" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1459" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0x3usev_di" bpmnElement="SetRuleEvent">
-        <di:waypoint xsi:type="dc:Point" x="462" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="522" y="120" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="492" y="99" width="0" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ParallelGateway_1dm6r73_di" bpmnElement="ExclusiveGateway_03na3za">
-        <dc:Bounds x="1238" y="95" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1263" y="149" width="0" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_1wkpko1_di" bpmnElement="WaitCampaignEndEvent">
-        <di:waypoint xsi:type="dc:Point" x="1288" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1321" y="120" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1304.5" y="99" width="0" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_1snz39t_di" bpmnElement="CheckComarchStatusTask">
-        <dc:Bounds x="1213" y="328" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="IntermediateCatchEvent_16dkho6_di" bpmnElement="WaitCheckMechanicsStatus">
-        <dc:Bounds x="1245" y="215" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1154" y="221" width="83" height="36" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1ttp8bq_di" bpmnElement="SequenceFlow_1ttp8bq">
-        <di:waypoint xsi:type="dc:Point" x="1263" y="145" />
-        <di:waypoint xsi:type="dc:Point" x="1263" y="215" />
+        <di:waypoint x="1330" y="425" />
+        <di:waypoint x="1330" y="485" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1278" y="174" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0pawltp_di" bpmnElement="SequenceFlow_0pawltp">
-        <di:waypoint xsi:type="dc:Point" x="1263" y="251" />
-        <di:waypoint xsi:type="dc:Point" x="1263" y="328" />
+        <di:waypoint x="1330" y="521" />
+        <di:waypoint x="1330" y="600" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1278" y="283.5" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="EndEvent_0ixn4yd_di" bpmnElement="CampaignEndEvent">
-        <dc:Bounds x="1644" y="102" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1572" y="142" width="90" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_04prl6i_di" bpmnElement="SequenceFlow_04prl6i">
-        <di:waypoint xsi:type="dc:Point" x="1313" y="368" />
-        <di:waypoint xsi:type="dc:Point" x="1342" y="368" />
-        <di:waypoint xsi:type="dc:Point" x="1342" y="216" />
-        <di:waypoint xsi:type="dc:Point" x="1267" y="216" />
+        <di:waypoint x="1380" y="640" />
+        <di:waypoint x="1420" y="640" />
+        <di:waypoint x="1420" y="486" />
+        <di:waypoint x="1336" y="486" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1357" y="286" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_0dacqog_di" bpmnElement="FinalCheckUpcTask">
-        <dc:Bounds x="1516" y="80" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0z434os_di" bpmnElement="SequenceFlow_0z434os">
-        <di:waypoint xsi:type="dc:Point" x="1616" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1644" y="120" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1630" y="99" width="0" height="12" />
-        </bpmndi:BPMNLabel>
+      <bpmndi:BPMNEdge id="Flow_1y51ec0_di" bpmnElement="Flow_1y51ec0">
+        <di:waypoint x="1840" y="400" />
+        <di:waypoint x="1922" y="400" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1oaoqjb_di" bpmnElement="Flow_1oaoqjb">
+        <di:waypoint x="1064" y="400" />
+        <di:waypoint x="1140" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04yc8wg_di" bpmnElement="Flow_04yc8wg">
+        <di:waypoint x="1240" y="400" />
+        <di:waypoint x="1305" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0egrsv3_di" bpmnElement="Flow_0egrsv3">
+        <di:waypoint x="1330" y="252" />
+        <di:waypoint x="1330" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1d5bmi8_di" bpmnElement="Flow_1d5bmi8">
+        <di:waypoint x="1380" y="140" />
+        <di:waypoint x="1430" y="140" />
+        <di:waypoint x="1430" y="270" />
+        <di:waypoint x="1348" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_1gxnv1u_di" bpmnElement="WaitStartCampaign">
+        <dc:Bounds x="426" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="408" y="422" width="84" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_08wc5do_di" bpmnElement="StartEvent">
+        <dc:Bounds x="173" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="148" y="423" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0dn9f6s_di" bpmnElement="FreezeTask">
+        <dc:Bounds x="301" y="360" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_135hh3e_di" bpmnElement="SendToComarchTask">
+        <dc:Bounds x="522" y="360" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_0zvhz1i_di" bpmnElement="WaitComarch">
+        <dc:Bounds x="673" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="668" y="422" width="53" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1qutb12_di" bpmnElement="CheckComarchTask">
+        <dc:Bounds x="749" y="360" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_04nrwuh_di" bpmnElement="DelaySendToUpc">
+        <dc:Bounds x="893" y="383" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="868" y="428" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0mo0fit_di" bpmnElement="SendToUpcTask">
+        <dc:Bounds x="964" y="360" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="IntermediateCatchEvent_03z43lf_di" bpmnElement="IntermediateCatchEvent_03z43lf">
-        <dc:Bounds x="236" y="102" width="36" height="36" />
+        <dc:Bounds x="236" y="382" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="212" y="52" width="83" height="36" />
+          <dc:Bounds x="212" y="332" width="84" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_03c7v8l_di" bpmnElement="SequenceFlow_03c7v8l">
-        <di:waypoint xsi:type="dc:Point" x="272" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="301" y="120" />
+      <bpmndi:BPMNShape id="Activity_0wxb5sn_di" bpmnElement="Activity_0wxb5sn">
+        <dc:Bounds x="1140" y="360" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ParallelGateway_1dm6r73_di" bpmnElement="ExclusiveGateway_03na3za">
+        <dc:Bounds x="1305" y="375" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="286.5" y="99" width="0" height="12" />
+          <dc:Bounds x="1263" y="149" width="0" height="12" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_16dkho6_di" bpmnElement="WaitCheckMechanicsStatus">
+        <dc:Bounds x="1312" y="485" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1221" y="491" width="84" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1snz39t_di" bpmnElement="CheckComarchStatusTask">
+        <dc:Bounds x="1280" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0nkfs0c_di" bpmnElement="Event_14femby">
+        <dc:Bounds x="1312" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1237" y="250" width="66" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_134znnp_di" bpmnElement="CheckUpcTask">
+        <dc:Bounds x="1280" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_0h4ycqi_di" bpmnElement="WaitCampaignEnd">
+        <dc:Bounds x="1492" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1483" y="427" width="54" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1lytrqe_di" bpmnElement="UnfreezeTask">
+        <dc:Bounds x="1590" y="360" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0owa8xd_di" bpmnElement="Activity_0owa8xd">
+        <dc:Bounds x="1740" y="360" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0ixn4yd_di" bpmnElement="CampaignEndEvent">
+        <dc:Bounds x="1922" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1572" y="142" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -28,7 +29,11 @@ public class Guest {
     private Boolean isFrozen;
 
     @Column(name = "comm_status")
-    private String communicationStatus;
+    @Enumerated(EnumType.STRING)
+    private GuestCommunicationStatus communicationStatus;
+
+    @Column(name = "deferred_date")
+    private LocalDateTime deferredDate;
 
     public Guest(Long code, UUID segmentId) {
         this.code = code;
