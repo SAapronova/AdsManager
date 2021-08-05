@@ -52,8 +52,6 @@ class CampaignServiceImplTest {
     @MockBean
     private RuntimeService runtimeService;
     @MockBean
-    private TemplateDefinitionService templateDefinitionService;
-    @MockBean
     private KafkaService kafkaService;
     @MockBean
     private TestCommunicationSenderToUpc senderToUpc;
@@ -109,7 +107,7 @@ class CampaignServiceImplTest {
         when(runtimeService.startProcessInstanceByKey(eq(CAMPAIGN_PROCESS_DEFINITION_KEY),
                 eq(campaign.getCampaignCode()), captor.capture())).thenReturn(processInstance);
 
-        Campaign campaign = campaignService.create(campaignDto);
+        campaign = campaignService.create(campaignDto);
 
         assertEquals(campaignDto.getCampaignCode(), campaign.getCampaignCode());
         assertEquals(campaignDto.getPeriodStart(), campaign.getPeriodStart());
@@ -118,8 +116,7 @@ class CampaignServiceImplTest {
         assertEquals(CampaignStatus.START, campaign.getStatus());
 
         verify(segmentService, times(1)).save(campaign.getId(), campaignDto.getSegments());
-        verify(runtimeService, times(1))
-                .startProcessInstanceByKey(eq(CAMPAIGN_PROCESS_DEFINITION_KEY), eq(campaign.getCampaignCode()), anyMap());
+        verify(runtimeService, times(1)).startProcessInstanceByKey(eq(CAMPAIGN_PROCESS_DEFINITION_KEY), eq(campaign.getCampaignCode()), captor.capture());
         Map<String, Object> variables = captor.getValue();
         assertEquals(campaignDto.getCampaignCode(), variables.get("camp_id"));
         assertEquals("2021-01-10T00:00", ((Timestamp) variables.get("start_date")).toLocalDateTime().plusHours(3).toString());
@@ -182,7 +179,7 @@ class CampaignServiceImplTest {
     }
 
     @Test
-    public void testCommunication() {
+    void testCommunication() {
         TestCommunicationDto dto = getTestCommunicationDto();
 
         campaign.setCampaignCode(dto.getCampaignCode())
@@ -203,7 +200,7 @@ class CampaignServiceImplTest {
     }
 
     @Test
-    public void testCommunication_LikeFirstCampaign() {
+    void testCommunication_LikeFirstCampaign() {
         TestCommunicationDto dto = getTestCommunicationDto();
 
         campaign.setCampaignCode(dto.getCampaignCode())

@@ -1,6 +1,5 @@
 package com.x5.bigdata.dvcm.process.dto;
 
-import com.x5.bigdata.dvcm.process.entity.OfferTemplate;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,15 +18,21 @@ public class SegmentInfoDto {
     private String contentLink;
     private String contentLinkText;
     private String imageUrl;
-    private OfferTemplate offerTemplate;
+    private String offerTemplate;
     private Integer points;
     private Integer multiplier;
     private Integer discount;
-    private Integer cacheBack;
     private Integer minSum;
     private Integer purchases;
     private Integer rewardPeriod;
-    private Integer maxReward;
+    private String zeroNameCategory;
+    private String firstNameCategory;
+    private String secondNameCategory;
+    private String textSlipCheck;
+    private Integer pluCount;
+    private String pluList;
+    private Integer maxBenefit;
+    private Integer cashback;
     private Boolean isRuleOn;
     private Boolean isSegmentOn;
     private String ruleCode;
