@@ -42,6 +42,7 @@ class CheckComarchTaskTest {
     private static final String CAMPAIGN_CODE = "A-1-1-test";
     private static final UUID TARGET_SEGMENT_ID = UUID.randomUUID();
     private static final UUID CONTROL_SEGMENT_ID = UUID.randomUUID();
+    private static final String OFFER_TEMPLATE = "TST_SAS_14";
 
     @MockBean
     private CampaignService campaignService;
@@ -78,11 +79,15 @@ class CheckComarchTaskTest {
                 .andExpect(jsonPath("$.camp_id", is(CAMPAIGN_CODE)))
                 .andExpect(jsonPath("$.date_start", is("2021-01-02 12:30:00")))
                 .andExpect(jsonPath("$.mechanics", is("TST_SAS_14")))
-                .andExpect(jsonPath("$.mechanics_params.OFFER_POINT_COEFFICIENT", is(1)))
-                .andExpect(jsonPath("$.mechanics_params.OFFER_BONUS_AMT", is(2)))
-                .andExpect(jsonPath("$.mechanics_params.OFFER_CH_SUM", is(3)))
-                .andExpect(jsonPath("$.mechanics_params.OFFER_CH_BALL_AMOUNT", is(4)))
-                .andExpect(jsonPath("$.mechanics_params.OFFER_EXPT_DELAY", is(5)))
+                .andExpect(jsonPath("$.mechanics_params.multiplier", is(1)))
+                .andExpect(jsonPath("$.mechanics_params.points", is(2)))
+                .andExpect(jsonPath("$.mechanics_params.min_sum", is(3)))
+                .andExpect(jsonPath("$.mechanics_params.purchases_num", is(4)))
+                .andExpect(jsonPath("$.mechanics_params.rewards_period", is(5)))
+                .andExpect(jsonPath("$.mechanics_params.plu_list", is("123123, 321321, 555")))
+                .andExpect(jsonPath("$.mechanics_params.first_name_category", is("first")))
+                .andExpect(jsonPath("$.mechanics_params.second_name_category", is("second")))
+                .andExpect(jsonPath("$.mechanics_params.zero_name_category", is("zero")))
                 .andRespond(withSuccess("{\"rule\": true, \"segment\": true}", MediaType.APPLICATION_JSON));
 
         when(execution.getProcessBusinessKey()).thenReturn(CAMPAIGN_CODE);
@@ -110,21 +115,29 @@ class CheckComarchTaskTest {
                         new Segment()
                                 .setId(CONTROL_SEGMENT_ID)
                                 .setType(SegmentType.CONTROL_GROUP)
-                                .setOfferTemplate(OfferTemplate.TST_SAS_14)
+                                .setOfferTemplate(OFFER_TEMPLATE)
                                 .setMultiplier(1)
                                 .setPoints(2)
                                 .setMinSum(3)
                                 .setPurchases(4)
                                 .setRewardPeriod(5)
+                                .setPluList("123123, 321321, 555")
+                                .setFirstNameCategory("first")
+                                .setSecondNameCategory("second")
+                                .setZeroNameCategory("zero")
                                 .setChannelType("VIBER"),
                         new Segment()
                                 .setId(TARGET_SEGMENT_ID)
-                                .setOfferTemplate(OfferTemplate.TST_SAS_14)
+                                .setOfferTemplate(OFFER_TEMPLATE)
                                 .setMultiplier(1)
                                 .setPoints(2)
                                 .setMinSum(3)
                                 .setPurchases(4)
                                 .setRewardPeriod(5)
+                                .setPluList("123123, 321321, 555")
+                                .setFirstNameCategory("first")
+                                .setSecondNameCategory("second")
+                                .setZeroNameCategory("zero")
                                 .setContentText("content text")
                                 .setContentLink("content link")
                                 .setContentLinkText("content link text")

@@ -1,7 +1,7 @@
 package com.x5.bigdata.dvcm.process.task;
 
 import com.x5.bigdata.dvcm.process.dto.ComarchStatusDto;
-import com.x5.bigdata.dvcm.process.dto.MechanicsParamsDto;
+import com.x5.bigdata.dvcm.process.dto.OfferDataDto;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
 import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
@@ -42,12 +42,21 @@ public class CheckComarchTask implements JavaDelegate {
                         .campaignCode(campaignCode)
                         .periodStart(campaign.getPeriodStart())
                         .mechanics(segment.getOfferTemplate())
-                        .mechanicsParams(MechanicsParamsDto.builder()
+                        .mechanicsParams(OfferDataDto.builder()
                                 .points(segment.getPoints())
-                                .purchasesNum(segment.getPurchases())
+                                .purchases(segment.getPurchases())
                                 .minSum(segment.getMinSum())
-                                .rewardsPeriod(segment.getRewardPeriod())
+                                .rewardPeriod(segment.getRewardPeriod())
                                 .multiplier(segment.getMultiplier())
+                                .zeroNameCategory(segment.getZeroNameCategory())
+                                .firstNameCategory(segment.getFirstNameCategory())
+                                .secondNameCategory(segment.getSecondNameCategory())
+                                .discount(segment.getDiscount())
+                                .cashback(segment.getCashback())
+                                .maxBenefit(segment.getMaxBenefit())
+                                .pluCount(segment.getPluCount())
+                                .pluList(segment.getPluList())
+                                .textSlipCheck(segment.getTextSlipCheck())
                                 .build())
                         .build();
 

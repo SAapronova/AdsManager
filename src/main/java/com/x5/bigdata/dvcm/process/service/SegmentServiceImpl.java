@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -33,10 +34,20 @@ public class SegmentServiceImpl implements SegmentService {
                     .setContentLinkText(segmentDto.getContentLinkText())
                     .setImageUrl(segmentDto.getImageUrl())
                     .setOfferTemplate(segmentDto.getOfferTemplate())
-                    .setPoints(segmentDto.getOfferData().getPoints())
-                    .setMinSum(segmentDto.getOfferData().getMinSum())
                     .setPurchases(segmentDto.getOfferData().getPurchases())
-                    .setRewardPeriod(segmentDto.getOfferData().getRewardPeriod());
+                    .setCashback(segmentDto.getOfferData().getCashback())
+                    .setDiscount(segmentDto.getOfferData().getDiscount())
+                    .setMultiplier(segmentDto.getOfferData().getMultiplier())
+                    .setMinSum(segmentDto.getOfferData().getMinSum())
+                    .setRewardPeriod(segmentDto.getOfferData().getRewardPeriod())
+                    .setPoints(segmentDto.getOfferData().getPoints())
+                    .setFirstNameCategory(segmentDto.getOfferData().getFirstNameCategory())
+                    .setSecondNameCategory(segmentDto.getOfferData().getSecondNameCategory())
+                    .setZeroNameCategory(segmentDto.getOfferData().getZeroNameCategory())
+                    .setMaxBenefit(segmentDto.getOfferData().getMaxBenefit())
+                    .setPluCount(segmentDto.getOfferData().getPluCount())
+                    .setTextSlipCheck(segmentDto.getOfferData().getTextSlipCheck());
+            Optional.ofNullable(segmentDto.getOfferData().getPluList()).ifPresent(pluList -> segment.setPluList(pluList.substring(1, pluList.length()-1)));
 
             segmentRepository.save(segment);
             guestService.save(segment.getId(), segmentDto.getGuests());

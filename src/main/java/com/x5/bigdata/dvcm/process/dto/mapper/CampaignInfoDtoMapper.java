@@ -29,16 +29,25 @@ public class CampaignInfoDtoMapper {
                                 .points(segment.getPoints())
                                 .multiplier(segment.getMultiplier())
                                 .discount(segment.getDiscount())
-                                .cacheBack(segment.getCacheBack())
+                                .cashback(segment.getCashback())
                                 .minSum(segment.getMinSum())
                                 .purchases(segment.getPurchases())
                                 .rewardPeriod(segment.getRewardPeriod())
-                                .maxReward(segment.getMaxReward())
+                                .maxBenefit(segment.getMaxBenefit())
+                                .zeroNameCategory(segment.getZeroNameCategory())
+                                .firstNameCategory(segment.getFirstNameCategory())
+                                .secondNameCategory(segment.getSecondNameCategory())
+                                .pluCount(segment.getPluCount())
+                                .pluList(segment.getPluList())
+                                .textSlipCheck(segment.getTextSlipCheck())
                                 .isRuleOn(segment.getIsRuleOn())
                                 .isSegmentOn(segment.getIsSegmentOn())
                                 .ruleCode(segment.getRuleCode())
                                 .isUpc(segment.getIsUpc())
                                 .build()).collect(Collectors.toList()))
                 .build();
+    }
+    private CampaignInfoDtoMapper() {
+        throw new IllegalStateException();
     }
 }

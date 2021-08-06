@@ -1,7 +1,7 @@
 package com.x5.bigdata.dvcm.process.task;
 
 import com.x5.bigdata.dvcm.process.dto.ContentParamsDto;
-import com.x5.bigdata.dvcm.process.dto.MechanicsParamsDto;
+import com.x5.bigdata.dvcm.process.dto.OfferDataDto;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
 import com.x5.bigdata.dvcm.process.entity.Campaign;
 import com.x5.bigdata.dvcm.process.entity.CampaignStatus;
@@ -53,12 +53,21 @@ public class SendToUpcTask implements JavaDelegate, TestCommunicationSenderToUpc
                             .segmentType(segment.getType())
                             .channelType(segment.getChannelType())
                             .mechanics(segment.getOfferTemplate())
-                            .mechanicsParams(MechanicsParamsDto.builder()
+                            .mechanicsParams(OfferDataDto.builder()
                                     .points(segment.getPoints())
-                                    .purchasesNum(segment.getPurchases())
+                                    .purchases(segment.getPurchases())
                                     .minSum(segment.getMinSum())
-                                    .rewardsPeriod(segment.getRewardPeriod())
+                                    .rewardPeriod(segment.getRewardPeriod())
                                     .multiplier(segment.getMultiplier())
+                                    .cashback(segment.getCashback())
+                                    .discount(segment.getDiscount())
+                                    .zeroNameCategory(segment.getZeroNameCategory())
+                                    .firstNameCategory(segment.getFirstNameCategory())
+                                    .secondNameCategory(segment.getSecondNameCategory())
+                                    .maxBenefit(segment.getMaxBenefit())
+                                    .pluCount(segment.getPluCount())
+                                    .pluList(segment.getPluList())
+                                    .textSlipCheck(segment.getTextSlipCheck())
                                     .build())
                             .contentParams(ContentParamsDto.builder()
                                     .contentText(segment.getContentText())

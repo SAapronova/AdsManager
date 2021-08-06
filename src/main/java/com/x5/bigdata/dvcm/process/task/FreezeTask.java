@@ -47,11 +47,15 @@ public class FreezeTask implements JavaDelegate {
                         .build();
 
                 log.info("FreezeTask request: {} ", dto);
-                Map<String, Boolean> statuses = restTemplate.postForObject(URL, dto, HashMap.class);
-                log.info("FreezeTask frozen: {} ",
-                        statuses.entrySet().stream().filter(entry -> entry.getValue()).count());
+                try {
+                    Map<String, Boolean> statuses = restTemplate.postForObject(URL, dto, HashMap.class);
+                    log.info("FreezeTask frozen: {} ",
+                            statuses.entrySet().stream().filter(Map.Entry::getValue).count());
 
-                guestService.setFrozen(segment.getId(), statuses);
+                    guestService.setFrozen(segment.getId(), statuses);
+                } catch (NullPointerException e) {
+                    log.info("FreezeTask error : ", e.getCause());
+                }
             }
         }
         campaignService.setStatus(campaignCode, CampaignStatus.FREEZE);
