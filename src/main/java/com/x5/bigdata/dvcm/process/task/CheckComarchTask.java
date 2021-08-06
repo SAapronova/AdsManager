@@ -9,25 +9,41 @@ import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import com.x5.bigdata.dvcm.process.service.CampaignService;
 import com.x5.bigdata.dvcm.process.service.SegmentService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class CheckComarchTask implements JavaDelegate {
-    private static final String URL = "/cvm_comarch/rule/check";
+    private static final String COMARCH_TASK = "/rule/check";
 
     private final CampaignService campaignService;
     private final SegmentService segmentService;
     private final RestTemplate restTemplate;
+    private final String host;
+    private final Integer port;
+
+    public CheckComarchTask(CampaignService campaignService,
+                            SegmentService segmentService,
+                            RestTemplate restTemplate,
+                            @Value("${dcvm.comarch.host:dcvm-comarch-service}")String host,
+                            @Value("${dcvm.comarch.port:8080}")Integer port) {
+        this.campaignService = campaignService;
+        this.segmentService = segmentService;
+        this.restTemplate = restTemplate;
+        this.host = host;
+        this.port = port;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
+        URI uri = new URI("http", null, host, port, COMARCH_TASK, null, null);
         String campaignCode = execution.getProcessBusinessKey();
         log.info("Init CheckComarchTask for campaign {} ", campaignCode);
 
@@ -61,7 +77,7 @@ public class CheckComarchTask implements JavaDelegate {
                         .build();
 
                 log.info("CheckComarchTask request: {} ", dto);
-                ComarchStatusDto statusDto = restTemplate.postForObject(URL, dto, ComarchStatusDto.class);
+                ComarchStatusDto statusDto = restTemplate.postForObject(uri, dto, ComarchStatusDto.class);
                 log.info("CheckComarchTask response: {} ", statusDto);
 
                 segmentService.setComarchStatus(segment.getId(), statusDto);

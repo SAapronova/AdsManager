@@ -74,7 +74,7 @@ class CheckComarchTaskTest {
     @Test
     void execute() throws Exception {
         mockServer
-                .expect(requestTo("http://service/cvm_comarch/rule/check"))
+                .expect(requestTo("http://dcvm-comarch-service:8080/rule/check"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(jsonPath("$.camp_id", is(CAMPAIGN_CODE)))
                 .andExpect(jsonPath("$.date_start", is("2021-01-02 12:30:00")))

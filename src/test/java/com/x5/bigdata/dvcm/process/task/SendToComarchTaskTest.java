@@ -71,7 +71,7 @@ class SendToComarchTaskTest {
     @Test
     void execute() throws Exception {
         mockServer
-                .expect(requestTo("http://service/cvm_comarch/rule/"))
+                .expect(requestTo("http://dcvm-comarch-service:8080/rule/"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(jsonPath("$.camp_id", is(CAMPAIGN_CODE)))
                 .andExpect(jsonPath("$.segment_type", is("2")))
