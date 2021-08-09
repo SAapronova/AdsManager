@@ -1,7 +1,6 @@
 package com.x5.bigdata.dvcm.process.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.x5.bigdata.dvcm.process.entity.OfferTemplate;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,7 +43,7 @@ public class CampaignSegmentDto {
 
     @JsonProperty("offer_template")
     @NotNull
-    private OfferTemplate offerTemplate;
+    private String offerTemplate;
 
     @JsonProperty("offer_data")
     @NotNull

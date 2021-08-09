@@ -33,7 +33,7 @@ public class FreezeTask implements JavaDelegate {
                          GuestService guestService,
                          RestTemplate restTemplate,
                          @Value("${dcvm.freeze.host:dcvm-freeze-service}") String host,
-                         @Value("${ dcvm.freeze.port:8080}") Integer port) {
+                         @Value("${dcvm.freeze.port:8080}") Integer port) {
         this.campaignService = campaignService;
         this.guestService = guestService;
         this.restTemplate = restTemplate;
@@ -62,11 +62,15 @@ public class FreezeTask implements JavaDelegate {
                         .build();
 
                 log.info("FreezeTask request: {} ", dto);
-                Map<String, Boolean> statuses = restTemplate.postForObject(uri, dto, HashMap.class);
-                log.info("FreezeTask frozen: {} ",
+                try {
+                    Map<String, Boolean> statuses = restTemplate.postForObject(uri, dto, HashMap.class);
+                    log.info("FreezeTask frozen: {} ",
                         statuses.entrySet().stream().filter(entry -> entry.getValue()).count());
 
-                guestService.setFrozen(segment.getId(), statuses);
+                    guestService.setFrozen(segment.getId(), statuses);
+                } catch (NullPointerException e) {
+                    log.info("FreezeTask error : ", e.getCause());
+                }
             }
         }
         campaignService.setStatus(campaignCode, CampaignStatus.FREEZE);

@@ -34,20 +34,17 @@ public class CampaignServiceImpl implements CampaignService {
     private final CampaignRepository campaignRepository;
     private final SegmentService segmentService;
     private final RuntimeService runtimeService;
-    private final TemplateDefinitionService templateDefinitionService;
     private final KafkaService kafkaService;
     private final TestCommunicationSenderToUpc senderToUpc;
 
     public CampaignServiceImpl(CampaignRepository campaignRepository,
                                SegmentService segmentService,
                                RuntimeService runtimeService,
-                               TemplateDefinitionService templateDefinitionService,
                                KafkaService kafkaService,
                                @Lazy TestCommunicationSenderToUpc senderToUpc) {
         this.campaignRepository = campaignRepository;
         this.segmentService = segmentService;
         this.runtimeService = runtimeService;
-        this.templateDefinitionService = templateDefinitionService;
         this.kafkaService = kafkaService;
         this.senderToUpc = senderToUpc;
     }
@@ -115,7 +112,6 @@ public class CampaignServiceImpl implements CampaignService {
             throw new ValidationException(List.of(
                     new ValidationItem("date_postperiod", dto.getPostPeriodEnd().toString(), WRONG_POST_PERIOD)));
         }
-        templateDefinitionService.validateOfferData(dto.getSegments());
     }
 
     @Override
@@ -152,9 +148,9 @@ public class CampaignServiceImpl implements CampaignService {
         segmentService.saveTestCommunicationSegment(newCampaign.getId(), dto.getSegments());
         log.info("Save new campaign: {}", newCampaign);
 
-        CompletableFuture.runAsync(() -> {
-            senderToUpc.send(newCampaign.getId());
-        });
+        CompletableFuture.runAsync(() ->
+            senderToUpc.send(newCampaign.getId())
+        );
 
         return newCampaign;
     }

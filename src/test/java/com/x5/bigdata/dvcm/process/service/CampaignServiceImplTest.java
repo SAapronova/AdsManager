@@ -53,8 +53,6 @@ class CampaignServiceImplTest {
     @MockBean
     private RuntimeService runtimeService;
     @MockBean
-    private TemplateDefinitionService templateDefinitionService;
-    @MockBean
     private KafkaService kafkaService;
     @MockBean
     private TestCommunicationSenderToUpc senderToUpc;
@@ -110,7 +108,7 @@ class CampaignServiceImplTest {
         when(runtimeService.startProcessInstanceByKey(eq(CAMPAIGN_PROCESS_DEFINITION_KEY),
                 eq(campaign.getCampaignCode()), captor.capture())).thenReturn(processInstance);
 
-        Campaign campaign = campaignService.create(campaignDto);
+        campaign = campaignService.create(campaignDto);
 
         assertEquals(campaignDto.getCampaignCode(), campaign.getCampaignCode());
         assertEquals(campaignDto.getPeriodStart(), campaign.getPeriodStart());
@@ -188,7 +186,7 @@ class CampaignServiceImplTest {
     }
 
     @Test
-    public void testCommunication() {
+    void testCommunication() {
         TestCommunicationDto dto = getTestCommunicationDto();
 
         campaign.setCampaignCode(dto.getCampaignCode())
@@ -209,7 +207,7 @@ class CampaignServiceImplTest {
     }
 
     @Test
-    public void testCommunication_LikeFirstCampaign() {
+    void testCommunication_LikeFirstCampaign() {
         TestCommunicationDto dto = getTestCommunicationDto();
 
         campaign.setCampaignCode(dto.getCampaignCode())

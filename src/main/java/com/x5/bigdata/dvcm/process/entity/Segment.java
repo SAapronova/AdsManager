@@ -48,8 +48,7 @@ public class Segment {
     private String imageUrl;
 
     @Column(name = "offer_template")
-    @Enumerated(EnumType.STRING)
-    private OfferTemplate offerTemplate;
+    private String offerTemplate;
 
     @Column(name = "points")
     private Integer points;
@@ -60,8 +59,8 @@ public class Segment {
     @Column(name = "discount")
     private Integer discount;
 
-    @Column(name = "cacheback")
-    private Integer cacheBack;
+    @Column(name = "cashback")
+    private Integer cashback;
 
     @Column(name = "min_sum")
     private Integer minSum;
@@ -72,8 +71,26 @@ public class Segment {
     @Column(name = "reward_period")
     private Integer rewardPeriod;
 
-    @Column(name = "max_reward")
-    private Integer maxReward;
+    @Column(name = "max_benefit")
+    private Integer maxBenefit;
+
+    @Column(name = "zero_name_category")
+    private String zeroNameCategory;
+
+    @Column(name = "first_name_category")
+    private String firstNameCategory;
+
+    @Column(name = "second_name_category")
+    private String secondNameCategory;
+
+    @Column(name = "text_slip_check")
+    private String textSlipCheck;
+
+    @Column(name = "plu_count")
+    private Integer pluCount;
+
+    @Column(name = "plu_list")
+    private String pluList;
 
     @Column(name = "is_rule_on")
     private Boolean isRuleOn;
