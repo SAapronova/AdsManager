@@ -3,7 +3,6 @@ package com.x5.bigdata.dvcm.process.service;
 import com.x5.bigdata.dvcm.process.dto.CampaignSegmentDto;
 import com.x5.bigdata.dvcm.process.dto.ComarchStatusDto;
 import com.x5.bigdata.dvcm.process.dto.OfferDataDto;
-import com.x5.bigdata.dvcm.process.entity.OfferTemplate;
 import com.x5.bigdata.dvcm.process.entity.Segment;
 import com.x5.bigdata.dvcm.process.entity.SegmentType;
 import com.x5.bigdata.dvcm.process.repository.SegmentRepository;
@@ -19,8 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -28,6 +26,7 @@ import static org.mockito.Mockito.*;
 class SegmentServiceImplTest {
     private static final UUID CAMPAIGN_ID = UUID.randomUUID();
     private static final UUID SEGMENT_ID = UUID.randomUUID();
+    private static final String OFFER_TEMPLATE = "TST_SAS_14";
 
     @Autowired
     private SegmentService segmentService;
@@ -92,17 +91,26 @@ class SegmentServiceImplTest {
         assertEquals(CAMPAIGN_ID, targetSegment.getCampaignId());
         assertEquals(SegmentType.TARGET_GROUP, targetSegment.getType());
         assertEquals("SMS", targetSegment.getChannelType());
-        assertEquals(OfferTemplate.TST_SAS_14, targetSegment.getOfferTemplate());
-        assertEquals(1, targetSegment.getMinSum());
-        assertEquals(2, targetSegment.getPoints());
-        assertEquals(3, targetSegment.getPurchases());
+        assertEquals(OFFER_TEMPLATE, targetSegment.getOfferTemplate());
+        assertEquals(3, targetSegment.getMinSum());
+        assertEquals(1, targetSegment.getPoints());
+        assertEquals(2, targetSegment.getPurchases());
         assertEquals(4, targetSegment.getRewardPeriod());
+        assertNull(targetSegment.getCashback());
+        assertEquals(6, targetSegment.getDiscount());
+        assertEquals("segment.getZeroNameCategory()", targetSegment.getZeroNameCategory());
+        assertEquals("segment.getFirstNameCategory()", targetSegment.getFirstNameCategory());
+        assertEquals("segment.getSecondNameCategory()", targetSegment.getSecondNameCategory());
+        assertEquals(7, targetSegment.getMaxBenefit());
+        assertNull(targetSegment.getPluCount());
+        assertEquals("123, 321, 123", targetSegment.getPluList());
+        assertEquals("slipCheck", targetSegment.getTextSlipCheck());
 
         Segment controlSegment = segmentCaptor.getAllValues().get(1);
         assertEquals(CAMPAIGN_ID, controlSegment.getCampaignId());
         assertEquals(SegmentType.CONTROL_GROUP, controlSegment.getType());
         assertEquals("VIBER", controlSegment.getChannelType());
-        assertEquals(OfferTemplate.TST_SAS_14, controlSegment.getOfferTemplate());
+        assertEquals(OFFER_TEMPLATE, controlSegment.getOfferTemplate());
         assertEquals(5, controlSegment.getMinSum());
         assertEquals(6, controlSegment.getPoints());
         assertEquals(7, controlSegment.getPurchases());
@@ -125,19 +133,29 @@ class SegmentServiceImplTest {
                 CampaignSegmentDto.builder()
                         .channel("SMS")
                         .segmentType(SegmentType.TARGET_GROUP)
-                        .offerTemplate(OfferTemplate.TST_SAS_14)
+                        .offerTemplate(OFFER_TEMPLATE)
                         .offerData(OfferDataDto.builder()
-                                .minSum(1)
-                                .points(2)
-                                .purchases(3)
+                                .points(1)
+                                .purchases(2)
+                                .minSum(3)
                                 .rewardPeriod(4)
+                                .multiplier(5)
+                                .cashback(null)
+                                .discount(6)
+                                .zeroNameCategory("segment.getZeroNameCategory()")
+                                .firstNameCategory("segment.getFirstNameCategory()")
+                                .secondNameCategory("segment.getSecondNameCategory()")
+                                .maxBenefit(7)
+                                .pluCount(null)
+                                .pluList("[123, 321, 123]")
+                                .textSlipCheck("slipCheck")
                                 .build())
                         .guests(List.of(1L, 2L))
                         .build(),
                 CampaignSegmentDto.builder()
                         .channel("VIBER")
                         .segmentType(SegmentType.CONTROL_GROUP)
-                        .offerTemplate(OfferTemplate.TST_SAS_14)
+                        .offerTemplate(OFFER_TEMPLATE)
                         .offerData(OfferDataDto.builder()
                                 .minSum(5)
                                 .points(6)

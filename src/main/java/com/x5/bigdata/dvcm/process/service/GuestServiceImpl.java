@@ -1,13 +1,18 @@
 package com.x5.bigdata.dvcm.process.service;
 
+import com.x5.bigdata.dvcm.process.dto.GuestDto;
+import com.x5.bigdata.dvcm.process.entity.Guest;
+import com.x5.bigdata.dvcm.process.entity.GuestCommunicationStatus;
 import com.x5.bigdata.dvcm.process.repository.GuestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,6 +46,22 @@ public class GuestServiceImpl implements GuestService {
     }
 
     @Override
+    public List<Guest> getRefreshableGuestsBySegmentId(UUID segmentId) {
+        Set<GuestCommunicationStatus> refreshableStatuses = Set.of(
+                GuestCommunicationStatus.PENDING,
+                GuestCommunicationStatus.SYSTEM_ERROR,
+                GuestCommunicationStatus.DEFERRED);
+
+        return guestRepository.findAllBySegmentId(segmentId)
+                .stream()
+                .filter(guest -> guest.getDeferredDate() == null ||
+                        guest.getDeferredDate().compareTo(LocalDateTime.now()) < 0)
+                .filter(guest -> guest.getCommunicationStatus() == null ||
+                        refreshableStatuses.contains(guest.getCommunicationStatus()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public void setFrozen(UUID segmentId, Map<String, Boolean> statuses) {
         statuses.entrySet().forEach(entry ->
@@ -49,8 +70,10 @@ public class GuestServiceImpl implements GuestService {
 
     @Override
     @Transactional
-    public void setUpcStatus(UUID segmentId, Map<String, String> statuses) {
-        statuses.entrySet().forEach(entry ->
-                guestRepository.setUpcStatus(segmentId, Long.valueOf(entry.getKey()), entry.getValue()));
+    public void setUpcStatus(UUID segmentId, List<GuestDto> statuses) {
+        statuses.forEach(entry ->
+                guestRepository.setUpcStatus(segmentId, entry.getCode(),
+                        entry.getCommunicationStatus(),
+                        entry.getDeferredDate()));
     }
 }

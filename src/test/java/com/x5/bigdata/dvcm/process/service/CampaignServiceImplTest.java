@@ -33,6 +33,7 @@ import java.util.UUID;
 import static com.x5.bigdata.dvcm.process.service.CampaignServiceImpl.CAMPAIGN_PROCESS_DEFINITION_KEY;
 import static com.x5.bigdata.dvcm.process.service.CampaignServiceImpl.CAMPAIGN_TEST_COMMUNICATION_ATTRIBUTE;
 import static com.x5.bigdata.dvcm.process.validators.ValidationMessages.*;
+import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -51,8 +52,6 @@ class CampaignServiceImplTest {
     private CampaignRepository campaignRepository;
     @MockBean
     private RuntimeService runtimeService;
-    @MockBean
-    private TemplateDefinitionService templateDefinitionService;
     @MockBean
     private KafkaService kafkaService;
     @MockBean
@@ -104,12 +103,12 @@ class CampaignServiceImplTest {
     }
 
     @Test
-    void create() {
+    void create() throws InterruptedException {
         ArgumentCaptor<Map<String, Object>> captor = ArgumentCaptor.forClass(Map.class);
         when(runtimeService.startProcessInstanceByKey(eq(CAMPAIGN_PROCESS_DEFINITION_KEY),
                 eq(campaign.getCampaignCode()), captor.capture())).thenReturn(processInstance);
 
-        Campaign campaign = campaignService.create(campaignDto);
+        campaign = campaignService.create(campaignDto);
 
         assertEquals(campaignDto.getCampaignCode(), campaign.getCampaignCode());
         assertEquals(campaignDto.getPeriodStart(), campaign.getPeriodStart());
@@ -117,9 +116,12 @@ class CampaignServiceImplTest {
         assertEquals(campaignDto.getPostPeriodEnd(), campaign.getPostPeriodEnd());
         assertEquals(CampaignStatus.START, campaign.getStatus());
 
+        sleep(2000);
+
         verify(segmentService, times(1)).save(campaign.getId(), campaignDto.getSegments());
         verify(runtimeService, times(1))
                 .startProcessInstanceByKey(eq(CAMPAIGN_PROCESS_DEFINITION_KEY), eq(campaign.getCampaignCode()), anyMap());
+
         Map<String, Object> variables = captor.getValue();
         assertEquals(campaignDto.getCampaignCode(), variables.get("camp_id"));
         assertEquals("2021-01-10T00:00", ((Timestamp) variables.get("start_date")).toLocalDateTime().plusHours(3).toString());
@@ -128,6 +130,8 @@ class CampaignServiceImplTest {
         assertEquals("2021-01-10T10:00", ((Timestamp) variables.get("start_upc_date")).toLocalDateTime().plusHours(3).toString());
         assertEquals("2021-03-31T00:00", ((Timestamp) variables.get("post_period_end")).toLocalDateTime().plusHours(3).toString());
         assertEquals("PT6H", variables.get("check_clm_cycle").toString());
+        assertEquals("P1D", variables.get("refresh_status_time").toString());
+
     }
 
     @Test
@@ -182,7 +186,7 @@ class CampaignServiceImplTest {
     }
 
     @Test
-    public void testCommunication() {
+    void testCommunication() {
         TestCommunicationDto dto = getTestCommunicationDto();
 
         campaign.setCampaignCode(dto.getCampaignCode())
@@ -203,7 +207,7 @@ class CampaignServiceImplTest {
     }
 
     @Test
-    public void testCommunication_LikeFirstCampaign() {
+    void testCommunication_LikeFirstCampaign() {
         TestCommunicationDto dto = getTestCommunicationDto();
 
         campaign.setCampaignCode(dto.getCampaignCode())

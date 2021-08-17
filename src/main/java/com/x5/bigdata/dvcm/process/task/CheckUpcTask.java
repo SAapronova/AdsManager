@@ -1,39 +1,73 @@
 package com.x5.bigdata.dvcm.process.task;
 
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import com.x5.bigdata.dvcm.process.dto.GuestDto;
 import com.x5.bigdata.dvcm.process.dto.SegmentDto;
-import com.x5.bigdata.dvcm.process.entity.Segment;
-import com.x5.bigdata.dvcm.process.entity.SegmentType;
+import com.x5.bigdata.dvcm.process.entity.*;
 import com.x5.bigdata.dvcm.process.service.CampaignService;
 import com.x5.bigdata.dvcm.process.service.GuestService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class CheckUpcTask implements JavaDelegate {
-    private static final String URL = "/cvm_upc/communications/check";
+    private static final String CHECK_PATH = "/communications/check";
 
     private final CampaignService campaignService;
     private final GuestService guestService;
     private final RestTemplate restTemplate;
+    private final String host;
+    private final Integer port;
+
+
+    public CheckUpcTask (CampaignService campaignService,
+                         GuestService guestService,
+                         RestTemplate restTemplate,
+                         @Value("${dcvm.upc.host:dcvm-upc-service}") String host,
+                         @Value("${dcvm.upc.port:8080}") Integer port) {
+        this.campaignService = campaignService;
+        this.guestService = guestService;
+        this.restTemplate = restTemplate;
+        this.host = host;
+        this.port = port;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         String campaignCode = execution.getProcessBusinessKey();
+        checkUpcStatuses(campaignCode);
+    }
+
+    public void checkUpcStatuses(String campaignCode) throws URISyntaxException {
+        URI uri = new URI("http", null, host, port, CHECK_PATH, null, null);
+
         log.info("Init CheckUpcTask for campaign {} ", campaignCode);
 
-        for (Segment segment : campaignService.getByCode(campaignCode).getSegments()) {
+        Campaign currentCampaign = campaignService.getByCode(campaignCode);
+
+        if (CampaignStatus.FINISH.equals(currentCampaign.getStatus())) {
+            return;
+        }
+
+        for (Segment segment : currentCampaign.getSegments()) {
             if (!SegmentType.CONTROL_GROUP.equals(segment.getType())) {
-                List<Long> codes = guestService.getFrozenCodesBySegmentId(segment.getId());
+
+                List<Guest> codes = guestService.getRefreshableGuestsBySegmentId(segment.getId());
+
                 int guestCount = codes.size();
                 int i0 = 0;
                 while (i0 < guestCount) {
@@ -41,18 +75,21 @@ public class CheckUpcTask implements JavaDelegate {
                     SegmentDto dto = SegmentDto.builder()
                             .campaignCode(campaignCode)
                             .channelType(segment.getChannelType())
-                            .guests(codes.subList(i0, i1))
+                            .guests(codes.subList(i0, i1).stream().map(Guest::getCode).collect(Collectors.toList()))
                             .build();
 
                     log.info("CheckUpcTask request: {} ", dto);
-                    Map<String, String> statuses = restTemplate.postForObject(URL, dto, HashMap.class);
-                    log.info("CheckUpcTask response: {} ", statuses.size());
+                    ResponseEntity<List<GuestDto>> rEntity = restTemplate.exchange(uri, HttpMethod.POST, new HttpEntity<>(dto),
+                            new ParameterizedTypeReference<>() {});
 
-                    guestService.setUpcStatus(segment.getId(), statuses);
+                    List<GuestDto> guestStatuses = rEntity.getBody();
+                    log.info("CheckUpcTask response: {} ", guestStatuses.size());
+                    guestService.setUpcStatus(segment.getId(), guestStatuses);
                     i0 = i1;
                 }
             }
         }
-        log.info("End CheckUpcTask for campaign {} ", campaignCode);
+
+        log.info("End CheckUpcTask for campaign {}", campaignCode);
     }
 }

@@ -1,6 +1,7 @@
 package com.x5.bigdata.dvcm.process.service;
 
-import org.springframework.data.repository.query.Param;
+import com.x5.bigdata.dvcm.process.dto.GuestDto;
+import com.x5.bigdata.dvcm.process.entity.Guest;
 
 import java.util.List;
 import java.util.Map;
@@ -16,5 +17,7 @@ public interface GuestService {
 
     void setFrozen(UUID segmentId, Map<String, Boolean> statuses);
 
-    void setUpcStatus(UUID segmentId, Map<String, String> statuses);
+    void setUpcStatus(UUID segmentId, List<GuestDto> statuses);
+
+    List<Guest> getRefreshableGuestsBySegmentId(UUID segmentId);
 }
