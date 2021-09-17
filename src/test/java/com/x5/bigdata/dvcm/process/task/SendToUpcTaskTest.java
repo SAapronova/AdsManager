@@ -40,6 +40,7 @@ class SendToUpcTaskTest {
     private static final String CAMPAIGN_CODE = "A-1-1-test";
     private static final UUID TARGET_SEGMENT_ID = UUID.randomUUID();
     private static final UUID CONTROL_SEGMENT_ID = UUID.randomUUID();
+    private static final String OFFER_TEMPLATE = "TST_SAS_14";
 
     @MockBean
     private CampaignService campaignService;
@@ -71,7 +72,7 @@ class SendToUpcTaskTest {
     @Test
     void execute() throws Exception {
         mockServer
-                .expect(requestTo("http://service/cvm_upc/communications/"))
+                .expect(anything())
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(jsonPath("$.camp_id", is(CAMPAIGN_CODE)))
                 .andExpect(jsonPath("$.segment_type", is("2")))
@@ -79,11 +80,13 @@ class SendToUpcTaskTest {
                 .andExpect(jsonPath("$.date_start", is("2021-01-02 12:30:00")))
                 .andExpect(jsonPath("$.date_end", is("2021-03-04 11:20:00")))
                 .andExpect(jsonPath("$.mechanics", is("TST_SAS_14")))
-                .andExpect(jsonPath("$.mechanics_params.OFFER_POINT_COEFFICIENT", is(1)))
-                .andExpect(jsonPath("$.mechanics_params.OFFER_BONUS_AMT", is(2)))
-                .andExpect(jsonPath("$.mechanics_params.OFFER_CH_SUM", is(3)))
-                .andExpect(jsonPath("$.mechanics_params.OFFER_CH_BALL_AMOUNT", is(4)))
-                .andExpect(jsonPath("$.mechanics_params.OFFER_EXPT_DELAY", is(5)))
+                .andExpect(jsonPath("$.mechanics_params.multiplier", is(1)))
+                .andExpect(jsonPath("$.mechanics_params.points", is(2)))
+                .andExpect(jsonPath("$.mechanics_params.min_sum", is(3)))
+                .andExpect(jsonPath("$.mechanics_params.purchases_num", is(4)))
+                .andExpect(jsonPath("$.mechanics_params.rewards_period", is(5)))
+                .andExpect(jsonPath("$.mechanics_params.plu_list", is("[123123, 321321, 555]")))
+                .andExpect(jsonPath("$.mechanics_params.first_name_category", is("first")))
                 .andExpect(jsonPath("$.content.communication_link", is("content link")))
                 .andExpect(jsonPath("$.content.communication_template_title", is("content link text")))
                 .andExpect(jsonPath("$.content.communication_template_text", is("content text")))
@@ -115,21 +118,25 @@ class SendToUpcTaskTest {
                         new Segment()
                                 .setId(CONTROL_SEGMENT_ID)
                                 .setType(SegmentType.CONTROL_GROUP)
-                                .setOfferTemplate(OfferTemplate.TST_SAS_14)
+                                .setOfferTemplate(OFFER_TEMPLATE)
                                 .setMultiplier(1)
                                 .setPoints(2)
                                 .setMinSum(3)
                                 .setPurchases(4)
                                 .setRewardPeriod(5)
+                                .setPluList("[123123, 321321, 555]")
+                                .setFirstNameCategory("first")
                                 .setChannelType("VIBER"),
                         new Segment()
                                 .setId(TARGET_SEGMENT_ID)
-                                .setOfferTemplate(OfferTemplate.TST_SAS_14)
+                                .setOfferTemplate(OFFER_TEMPLATE)
                                 .setMultiplier(1)
                                 .setPoints(2)
                                 .setMinSum(3)
                                 .setPurchases(4)
                                 .setRewardPeriod(5)
+                                .setPluList("[123123, 321321, 555]")
+                                .setFirstNameCategory("first")
                                 .setContentText("content text")
                                 .setContentLink("content link")
                                 .setContentLinkText("content link text")

@@ -5,25 +5,51 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Min;
-
 @Getter
 @Setter
 @Builder
 public class OfferDataDto {
+
     @JsonProperty("points")
-    @Min(1)
     private Integer points;
 
     @JsonProperty("min_sum")
-    @Min(1)
     private Integer minSum;
 
     @JsonProperty("purchases_num")
-    @Min(1)
     private Integer purchases;
 
     @JsonProperty("rewards_period")
-    @Min(1)
     private Integer rewardPeriod;
+
+    @JsonProperty("zero_name_category")
+    private String zeroNameCategory;
+
+    @JsonProperty("first_name_category")
+    private String firstNameCategory;
+
+    @JsonProperty("second_name_category")
+    private String secondNameCategory;
+
+    @JsonProperty("text_slip_check")
+    private String textSlipCheck;
+
+    @JsonProperty("multiplier")
+    private Integer multiplier;
+
+    @JsonProperty("discount")
+    private Integer discount;
+
+    @JsonProperty("plu_count")
+    private Integer pluCount;
+
+    @JsonProperty("plu_list")
+    private String pluList;
+
+    @JsonProperty("max_benefit")
+    private Integer maxBenefit;
+
+    @JsonProperty("cashback")
+    private Integer cashback;
+
 }

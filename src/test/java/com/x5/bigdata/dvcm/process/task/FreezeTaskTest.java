@@ -73,7 +73,7 @@ class FreezeTaskTest {
     @Test
     void execute() throws Exception {
         mockServer
-                .expect(requestTo("http://service/freeze/freeze/"))
+                .expect(anything())
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(jsonPath("$.camp_id", is(CAMPAIGN_CODE)))
                 .andExpect(jsonPath("$.segment_type", is("1")))
@@ -85,7 +85,7 @@ class FreezeTaskTest {
                 .andRespond(withSuccess("{\"3\": true, \"4\": false}", MediaType.APPLICATION_JSON));
 
         mockServer
-                .expect(requestTo("http://service/freeze/freeze/"))
+                .expect(anything())
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(jsonPath("$.camp_id", is(CAMPAIGN_CODE)))
                 .andExpect(jsonPath("$.segment_type", is("2")))
