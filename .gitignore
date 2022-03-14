@@ -3,6 +3,8 @@
 !gradle/wrapper/gradle-wrapper.jar
 /logs/
 /model/*
+/config/
+/k8s/
 
 ### STS ###
 .apt_generated
@@ -19,6 +21,7 @@
 *.iml
 *.ipr
 /out/
+.gitlab-ci.yml
 
 ### NetBeans ###
 /nbproject/private/
